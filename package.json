@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Abdelhakim-Baalla/WealthWave/issues"
   },
-  "homepage": "https://github.com/Abdelhakim-Baalla/WealthWave#readme"
+  "homepage": "https://github.com/Abdelhakim-Baalla/WealthWave#readme",
+  "dependencies": {
+    "sequelize": "^6.37.7"
+  }
 }
