@@ -58,12 +58,17 @@ budgets.belongsTo(categories, {
   foreignKey: "categorie",
 });
 
+(async () => {
+  await database.sync({ force: false });
+  console.log("Database synced");
+})();
+
 module.exports = {
-    database,
-    utilisateurs,
-    transactions,
-    objectifs,
-    notifications,
-    categories,
-    budgets,
-}
+  database,
+  utilisateurs,
+  transactions,
+  objectifs,
+  notifications,
+  categories,
+  budgets,
+};
