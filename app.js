@@ -4,6 +4,8 @@ const { utilisateurs } = require("./models");
 const port = 8080;
 
 app.use(express.json());
+app.set('view engine', 'ejs');
+app.set('view', './views');
 
 app.get("/users", async (req, res) => {
   const users = await utilisateurs.findAll();
