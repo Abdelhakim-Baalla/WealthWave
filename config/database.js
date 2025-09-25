@@ -5,6 +5,7 @@ const { Sequelize } = require("sequelize");
 const sequelize = new Sequelize("wealthwave", "root", "123456", {
   host: "localhost",
   dialect: "mysql",
+  logging: false,
 });
 
 // console.log(sequelize);
@@ -12,10 +13,10 @@ const sequelize = new Sequelize("wealthwave", "root", "123456", {
 sequelize
   .authenticate()
   .then(() => {
-    console.log("connected");
+    console.log("Database connected");
   })
   .catch((err) => {
-    console.error("Not connected", err);
+    console.error("Database Not connected", err);
   });
 
 module.exports = sequelize;

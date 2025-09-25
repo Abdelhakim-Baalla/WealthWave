@@ -1,0 +1,4 @@
+GET http://localhost:8080/users
+
+###
+POST http://localhost:8080/users?nom=baalla&prenom=ee&email=zaeaze@gmail.com&password=azeazed
