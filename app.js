@@ -26,7 +26,6 @@ app.get("/users", async (req, res) => {
 app.post("/users", async (req, res) => {
   try {
     const { nom, prenom, email, password, terms } = req.body;
-    console.log("teeeeeeeeeeeeeeeeeeeerms: ", terms);
     const utilisateurExist = await utilisateurs.findOne({
       where: { email: email },
     });
@@ -101,6 +100,41 @@ app.get("/connexion", (req, res) => {
   res.render("connexion", {
     title: "Connexion - WealthWave",
   });
+});
+
+app.post("/connexion", async (req, res) => {
+  const { email, password } = req.body;
+  const utilisateur = await utilisateurs.findOne({
+    where: {
+      email: email,
+    },
+  });
+
+  if (email.length == 0) {
+    return res.render("connexion", {
+      title: "Connexion - WealthWave",
+      error: "Saisez votre email",
+      email,
+    });
+  }
+
+  if (password.length == 0) {
+    return res.render("connexion", {
+      title: "Connexion - WealthWave",
+      error: "Saisez votre mot de passe",
+      email,
+    });
+  }
+
+  if (utilisateur && (await bcrypt.compare(password, utilisateur.password))) {
+    res.render("index", { title: "Home", message: "Connexion réussie!" });
+  } else {
+    res.render("connexion", {
+      title: "Connexion - WealthWave",
+      error: "l'email ou le mot de passe sont incorect",
+      email,
+    });
+  }
 });
 
 app.listen(port, () => {
