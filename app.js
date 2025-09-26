@@ -1,5 +1,5 @@
 const express = require("express");
-const session = require('express-session');
+const session = require("express-session");
 const bcrypt = require("bcrypt");
 const app = express();
 const { utilisateurs } = require("./models");
@@ -10,6 +10,14 @@ app.set("views", "./views");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: "key18",
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false },
+  })
+);
 
 app.get("/", (req, res) => {
   res.render("index", { title: "Home" });
