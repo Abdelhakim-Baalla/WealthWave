@@ -61,6 +61,16 @@ app.post("/users", async (req, res) => {
       });
     }
 
+     if (password.length < 8) {
+      return res.render("inscription", {
+        title: "Inscription - WealthWave",
+        error: "Le mot de passe doit contient 8 caracteres ou plus",
+        email,
+        nom,
+        prenom,
+      });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     await utilisateurs.create({ nom, prenom, email, password: hashedPassword });
 
