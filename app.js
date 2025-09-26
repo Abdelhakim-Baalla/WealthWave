@@ -25,8 +25,8 @@ app.get("/users", async (req, res) => {
 
 app.post("/users", async (req, res) => {
   try {
-    const { nom, prenom, email, password } = req.body;
-
+    const { nom, prenom, email, password, terms } = req.body;
+    console.log("teeeeeeeeeeeeeeeeeeeerms: ", terms);
     const utilisateurExist = await utilisateurs.findOne({
       where: { email: email },
     });
@@ -61,10 +61,20 @@ app.post("/users", async (req, res) => {
       });
     }
 
-     if (password.length < 8) {
+    if (password.length < 8) {
       return res.render("inscription", {
         title: "Inscription - WealthWave",
         error: "Le mot de passe doit contient 8 caracteres ou plus",
+        email,
+        nom,
+        prenom,
+      });
+    }
+
+    if (!terms) {
+      return res.render("inscription", {
+        title: "Inscription - WealthWave",
+        error: "Acceptez les terms et les conditions d'utilisation",
         email,
         nom,
         prenom,
