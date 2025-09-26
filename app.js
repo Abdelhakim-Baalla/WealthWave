@@ -35,6 +35,7 @@ app.post("/users", async (req, res) => {
       return res.render("inscription", {
         title: "Inscription - WealthWave",
         error: "L'email et existe deja, essayer avec un autre",
+        email, nom, prenom
       });
     }
 
