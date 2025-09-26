@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require('bcrypt');
 const app = express();
 const { utilisateurs } = require("./models");
 const port = 8080;
@@ -37,7 +38,9 @@ app.post("/users", async (req, res) => {
       });
     }
 
-    await utilisateurs.create({ nom, prenom, email, password });
+    const hashedPassword = await bcrypt.hash(password, 10)
+    await utilisateurs.create({ nom, prenom, email, password: hashedPassword });
+    
     res.redirect("/");
   } catch (error) {
     console.error("Erreur lors de l'inscription:", error);
