@@ -12,8 +12,18 @@ POST http://localhost:8080/users
 Content-Type: application/json
 
 {
-    nom: 'baalla';
-    prenom: 'baalla';
-    email: 'baalla@gmail.com';
-    password: 'baalla';
+    nom: 'baalla',
+    prenom: 'baalla',
+    email: 'baalla@gmail.com',
+    password: 'baalla',
+}
+
+### 
+POST http://localhost:8080/connexion
+
+Content-Type: application/json
+
+{
+    email: 'baalla@gmail.com',
+    password: 'baalla',
 }

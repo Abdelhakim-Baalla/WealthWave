@@ -19,6 +19,14 @@ app.use(
   })
 );
 
+function estConnecte(req, res, next) {
+  if (req.session.utilisateurId) {
+    next();
+  } else {
+    res.redirect("/connexion");
+  }
+}
+
 app.get("/", (req, res) => {
   res.render("index", { title: "Home" });
 });
@@ -139,7 +147,7 @@ app.post("/connexion", async (req, res) => {
   if (utilisateur && (await bcrypt.compare(password, utilisateur.password))) {
     req.session.utilisateurId = utilisateur.id;
     req.session.email = utilisateur.email;
-    res.render("dashboard", { title: "Dashboard - WealthWave", message: "Connexion réussie!" });
+    return res.redirect("/dashboard");
   } else {
     res.render("connexion", {
       title: "Connexion - WealthWave",
@@ -147,6 +155,11 @@ app.post("/connexion", async (req, res) => {
       email,
     });
   }
+});
+
+app.get("/dashboard", estConnecte, async (req, res) => {
+  const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
+  res.render("dashboard", { title: "Dashboard - WealthWave", utilisateur });
 });
 
 app.listen(port, () => {

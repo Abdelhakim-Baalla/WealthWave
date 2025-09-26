@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+  </head>
+  <body>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="error-message"><%= error %></div>
+    <% } %> <% if (typeof message !== 'undefined' && message) { %>
+    <div class="message-message"><%= message %></div>
+    <% } %>
+
+    <h1>Bonjour <%= utilisateur.prenom %> <%= utilisateur.nom %></h1>
+    <%= utilisateur.preferences.theme %>
+    <a href="/">Acceuil</a>
+    <a href="/deconnexion">Deconnexion</a>
+  </body>
+</html>
