@@ -170,9 +170,17 @@ app.get("/dashboard", estConnecte, async (req, res) => {
   res.render("dashboard", { title: "Dashboard - WealthWave", utilisateur });
 });
 
-app.get('/deconnexion', (req, res) => {
-    req.session.destroy();
-    res.redirect('/connexion');
+app.get("/deconnexion", (req, res) => {
+  req.session.destroy();
+  res.redirect("/connexion");
+});
+
+app.get("/profile", estConnecte, async (req, res) => {
+    const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
+    console.log(utilisateur);
+    res.render('profile', {
+        utilisateur: utilisateur
+    });
 });
 
 app.listen(port, () => {

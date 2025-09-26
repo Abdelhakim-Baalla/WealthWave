@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= typeof title !== 'undefined' ? title : 'profile' %></title>
+  </head>
+  <body>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="error-message"><%= error %></div>
+    <% } %> <% if (typeof message !== 'undefined' && message) { %>
+    <div class="message-message"><%= message %></div>
+    <% } %>
+
+    <form action="/profile" method="post">
+      <h1>Les information personnels</h1>
+      <img src="" alt="Image de profile" />
+      <input type="file" name="image" id="image" /><br />
+      <label for="nom">Nom</label>
+      <input
+        type="text"
+        name="nom"
+        id="nom"
+        value="<%= typeof nom !== 'undefined' ? nom : '' %>"
+      /><br />
+      <label for="prenom">Prenom</label>
+      <input
+        type="text"
+        name="prenom"
+        id="prenom"
+        value="<%= typeof prenom !== 'undefined' ? prenom : '' %>"
+      /><br />
+      <label for="email">Email</label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        value="<%= typeof email !== 'undefined' ? email : '' %>"
+      /><br />
+
+      <h1>Preferences</h1>
+      <label for="devise">Devise</label>
+      <input
+        type="text"
+        name="devise"
+        id="devise"
+        value="<%= typeof utilisateur.preferences !== 'undefined' ? utilisateur.preferences : '' %>"
+      /><br />
+
+      <button type="submit">Enregistrer</button>
+    </form>
+
+    <a href="/dashboard">Retour au Dashboard</a>
+  </body>
+</html>
