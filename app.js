@@ -3,19 +3,18 @@ const app = express();
 const { utilisateurs } = require("./models");
 const port = 8080;
 
-
-app.set('view engine', 'ejs');
-app.set('views', './views');
+app.set("view engine", "ejs");
+app.set("views", "./views");
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true }));
 
-app.get('/', (req, res) => {
-    res.render('index', { title: 'Home' });
+app.get("/", (req, res) => {
+  res.render("index", { title: "Home" });
 });
 
-app.get('/inscription', (req, res) => {
-    res.render('inscription', { title: 'Inscription - WealthWave' });
+app.get("/inscription", (req, res) => {
+  res.render("inscription", { title: "Inscription - WealthWave" });
 });
 
 app.get("/users", async (req, res) => {
@@ -24,10 +23,29 @@ app.get("/users", async (req, res) => {
 });
 
 app.post("/users", async (req, res) => {
-//   res.send(req.body);
-  const { nom, prenom, email, password } = req.body;
-  const newUser = await utilisateurs.create({ nom, prenom, email, password });
-  res.json(newUser);
+  try {
+    const { nom, prenom, email, password } = req.body;
+
+    const utilisateurExist = await utilisateurs.findOne({
+      where: { email: email },
+    });
+
+    if (utilisateurExist) {
+      return res.render("inscription", {
+        title: "Inscription - WealthWave",
+        error: "L'email et existe deja, essayer avec un autre",
+      });
+    }
+
+    await utilisateurs.create({ nom, prenom, email, password });
+    res.redirect("/");
+  } catch (error) {
+    console.error("Erreur lors de l'inscription:", error);
+    res.render("inscription", {
+      title: "Inscription - WealthWave",
+      error: "Une erreur s'est produite. Veuillez réessayer.",
+    });
+  }
 });
 
 app.listen(port, () => {
