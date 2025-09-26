@@ -113,11 +113,6 @@ app.get("/connexion", (req, res) => {
 
 app.post("/connexion", async (req, res) => {
   const { email, password } = req.body;
-  const utilisateur = await utilisateurs.findOne({
-    where: {
-      email: email,
-    },
-  });
 
   if (email.length == 0) {
     return res.render("connexion", {
@@ -135,8 +130,16 @@ app.post("/connexion", async (req, res) => {
     });
   }
 
+  const utilisateur = await utilisateurs.findOne({
+    where: {
+      email: email,
+    },
+  });
+
   if (utilisateur && (await bcrypt.compare(password, utilisateur.password))) {
-    res.render("index", { title: "Home", message: "Connexion réussie!" });
+    req.session.utilisateurId = utilisateur.id;
+    req.session.email = utilisateur.email;
+    res.render("dashboard", { title: "Dashboard - WealthWave", message: "Connexion réussie!" });
   } else {
     res.render("connexion", {
       title: "Connexion - WealthWave",
