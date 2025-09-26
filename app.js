@@ -35,7 +35,29 @@ app.post("/users", async (req, res) => {
       return res.render("inscription", {
         title: "Inscription - WealthWave",
         error: "L'email et existe deja, essayer avec un autre",
-        email, nom, prenom
+        email,
+        nom,
+        prenom,
+      });
+    }
+
+    if (nom.length < 3) {
+      return res.render("inscription", {
+        title: "Inscription - WealthWave",
+        error: "La taille nom doit etre plus que 3 caractere",
+        email,
+        nom,
+        prenom,
+      });
+    }
+
+    if (prenom.length < 5) {
+      return res.render("inscription", {
+        title: "Inscription - WealthWave",
+        error: "La taille prenom doit etre plus que 5 caractere",
+        email,
+        nom,
+        prenom,
       });
     }
 
