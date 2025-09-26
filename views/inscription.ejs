@@ -9,7 +9,7 @@
     <% if (typeof error !== 'undefined' && error) { %>
     <div class="error-message"><%= error %></div>
     <% } %>
-    
+
     <form action="/users" method="post">
       <label for="nom">Nom</label>
       <input type="text" name="nom" id="nom" /><br />
@@ -22,5 +22,8 @@
 
       <button type="submit">Inscrire</button>
     </form>
+
+    <a href="/connexion">Connectez</a>
+
   </body>
 </html>

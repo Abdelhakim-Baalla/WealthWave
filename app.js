@@ -1,5 +1,5 @@
 const express = require("express");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
 const app = express();
 const { utilisateurs } = require("./models");
 const port = 8080;
@@ -38,10 +38,13 @@ app.post("/users", async (req, res) => {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
+    const hashedPassword = await bcrypt.hash(password, 10);
     await utilisateurs.create({ nom, prenom, email, password: hashedPassword });
-    
-    res.redirect("/");
+
+    return res.render("connexion", {
+      title: "Connexion - WealthWave",
+      message: "L'utilisateur et crée avec success",
+    });
   } catch (error) {
     console.error("Erreur lors de l'inscription:", error);
     res.render("inscription", {
@@ -49,6 +52,12 @@ app.post("/users", async (req, res) => {
       error: "Une erreur s'est produite. Veuillez réessayer.",
     });
   }
+});
+
+app.get("/connexion", (req, res) => {
+  res.render("connexion", {
+    title: "Connexion - WealthWave",
+  });
 });
 
 app.listen(port, () => {
