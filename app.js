@@ -27,11 +27,19 @@ function estConnecte(req, res, next) {
   }
 }
 
+function nonConnecte(req, res, next) {
+  if (req.session.utilisateurId) {
+    res.redirect("/dashboard");
+  } else {
+    next();
+  }
+}
+
 app.get("/", (req, res) => {
   res.render("index", { title: "Home" });
 });
 
-app.get("/inscription", (req, res) => {
+app.get("/inscription", nonConnecte, (req, res) => {
   res.render("inscription", { title: "Inscription - WealthWave" });
 });
 
@@ -113,7 +121,7 @@ app.post("/users", async (req, res) => {
   }
 });
 
-app.get("/connexion", (req, res) => {
+app.get("/connexion", nonConnecte, (req, res) => {
   res.render("connexion", {
     title: "Connexion - WealthWave",
   });
