@@ -170,6 +170,11 @@ app.get("/dashboard", estConnecte, async (req, res) => {
   res.render("dashboard", { title: "Dashboard - WealthWave", utilisateur });
 });
 
+app.get('/deconnexion', (req, res) => {
+    req.session.destroy();
+    res.redirect('/connexion');
+});
+
 app.listen(port, () => {
   console.log("Server Connected");
 });
