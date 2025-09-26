@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/Abdelhakim-Baalla/WealthWave#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "ejs": "^3.1.10",
     "express": "^5.1.0",
     "mysql2": "^3.15.1",
     "sequelize": "^6.37.7"
