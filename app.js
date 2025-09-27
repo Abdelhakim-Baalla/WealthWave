@@ -15,7 +15,10 @@ app.use(
     secret: "key18",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false },
+    cookie: {
+      secure: false,
+      maxAge: 3600000,
+    },
   })
 );
 
@@ -176,11 +179,11 @@ app.get("/deconnexion", (req, res) => {
 });
 
 app.get("/profile", estConnecte, async (req, res) => {
-    const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
-    console.log(utilisateur);
-    res.render('profile', {
-        utilisateur: utilisateur
-    });
+  const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
+  // console.log(utilisateur);
+  res.render("profile", {
+    utilisateur: utilisateur,
+  });
 });
 
 app.listen(port, () => {

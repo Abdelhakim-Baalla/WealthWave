@@ -21,21 +21,21 @@
         type="text"
         name="nom"
         id="nom"
-        value="<%= typeof nom !== 'undefined' ? nom : '' %>"
+        value="<%= typeof utilisateur.nom !== 'undefined' ? utilisateur.nom : '' %>"
       /><br />
       <label for="prenom">Prenom</label>
       <input
         type="text"
         name="prenom"
         id="prenom"
-        value="<%= typeof prenom !== 'undefined' ? prenom : '' %>"
+        value="<%= typeof utilisateur.prenom !== 'undefined' ? utilisateur.prenom : '' %>"
       /><br />
       <label for="email">Email</label>
       <input
         type="email"
         name="email"
         id="email"
-        value="<%= typeof email !== 'undefined' ? email : '' %>"
+        value="<%= typeof utilisateur.email !== 'undefined' ? utilisateur.email : '' %>"
       /><br />
 
       <h1>Preferences</h1>
@@ -44,7 +44,7 @@
         type="text"
         name="devise"
         id="devise"
-        value="<%= typeof utilisateur.preferences !== 'undefined' ? utilisateur.preferences : '' %>"
+        value="<%= typeof utilisateur.preferences.devise !== 'undefined' ? utilisateur.preferences.devise : '' %>"
       /><br />
 
       <button type="submit">Enregistrer</button>
