@@ -200,7 +200,10 @@ app.post("/profile", estConnecte, async (req, res) => {
 
     req.session.email = email;
 
-    res.redirect("/profile");
+    res.render("profile", {
+      utilisateur: await utilisateurs.findByPk(req.session.utilisateurId),
+      message: "Profile mis à jour avec succès",
+    });
   } catch (error) {
     console.error("Erreur lors de la mise à jour du profil:", error);
     res.render("profile", {
