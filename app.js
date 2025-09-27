@@ -187,27 +187,32 @@ app.get("/profile", estConnecte, async (req, res) => {
 });
 
 app.post("/profile", estConnecte, async (req, res) => {
-  const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
-  const { nom, prenom, email, devise } = req.body;
+  try {
+    const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
+    const { nom, prenom, email, devise } = req.body;
 
-  await utilisateur.update(
-    {
+    await utilisateur.update({
       nom: nom,
       prenom: prenom,
       email: email,
-    },
-    {
-      where: {
-        id: req.session.utilisateurId,
-      },
-    }
-  );
+      devise: devise,
+    });
 
-  res.redirect("/profile");
+    req.session.email = email;
+
+    res.redirect("/profile");
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du profil:", error);
+    res.render("profile", {
+      utilisateur: await utilisateurs.findByPk(req.session.utilisateurId),
+      error:
+        "Une erreur s'est produite lors de la mise à jour. Veuillez réessayer.",
+    });
+  }
 });
 
 app.use((req, res, next) => {
-  res.status(404).render('404');
+  res.status(404).render("404");
 });
 
 app.listen(port, () => {

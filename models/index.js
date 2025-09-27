@@ -63,6 +63,11 @@ budgets.belongsTo(categories, {
   console.log("Database synced");
 })();
 
+// (async () => {
+//   await database.sync({ force: true });
+//   console.log("Database dropped and recreated");
+// })();
+
 module.exports = {
   database,
   utilisateurs,
