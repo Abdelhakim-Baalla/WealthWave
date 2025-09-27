@@ -186,6 +186,30 @@ app.get("/profile", estConnecte, async (req, res) => {
   });
 });
 
+app.post("/profile", estConnecte, async (req, res) => {
+  const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
+  const { nom, prenom, email, devise } = req.body;
+
+  await utilisateur.update(
+    {
+      nom: nom,
+      prenom: prenom,
+      email: email,
+    },
+    {
+      where: {
+        id: req.session.utilisateurId,
+      },
+    }
+  );
+
+  res.redirect("/profile");
+});
+
+app.use((req, res, next) => {
+  res.status(404).render('404');
+});
+
 app.listen(port, () => {
   console.log("Server Connected");
 });
