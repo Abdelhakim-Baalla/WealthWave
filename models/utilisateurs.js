@@ -25,9 +25,9 @@ const Utilisateur = sequelize.define("Utilisateur", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  preferences: {
-    type: DataTypes.JSON,
-    defaultValue: {},
+  devise: {
+    type: DataTypes.STRING,
+    defaultValue: "USD",
   },
   image: {
     type: DataTypes.STRING,

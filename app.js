@@ -15,7 +15,10 @@ app.use(
     secret: "key18",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false },
+    cookie: {
+      secure: false,
+      maxAge: 3600000,
+    },
   })
 );
 
@@ -170,9 +173,49 @@ app.get("/dashboard", estConnecte, async (req, res) => {
   res.render("dashboard", { title: "Dashboard - WealthWave", utilisateur });
 });
 
-app.get('/deconnexion', (req, res) => {
-    req.session.destroy();
-    res.redirect('/connexion');
+app.get("/deconnexion", (req, res) => {
+  req.session.destroy();
+  res.redirect("/connexion");
+});
+
+app.get("/profile", estConnecte, async (req, res) => {
+  const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
+  // console.log(utilisateur);
+  res.render("profile", {
+    utilisateur: utilisateur,
+  });
+});
+
+app.post("/profile", estConnecte, async (req, res) => {
+  try {
+    const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
+    const { nom, prenom, email, devise } = req.body;
+
+    await utilisateur.update({
+      nom: nom,
+      prenom: prenom,
+      email: email,
+      devise: devise,
+    });
+
+    req.session.email = email;
+
+    res.render("profile", {
+      utilisateur: await utilisateurs.findByPk(req.session.utilisateurId),
+      message: "Profile mis à jour avec succès",
+    });
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du profil:", error);
+    res.render("profile", {
+      utilisateur: await utilisateurs.findByPk(req.session.utilisateurId),
+      error:
+        "Une erreur s'est produite lors de la mise à jour. Veuillez réessayer.",
+    });
+  }
+});
+
+app.use((req, res, next) => {
+  res.status(404).render("404");
 });
 
 app.listen(port, () => {
