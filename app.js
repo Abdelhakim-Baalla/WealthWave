@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
@@ -227,8 +228,16 @@ app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
     },
   });
 
-  if(emailExist){
-    
+  if (emailExist) {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
   }
 });
 
