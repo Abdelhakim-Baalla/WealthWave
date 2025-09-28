@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mot de passe oublié</title>
-</head>
-<body>
+  </head>
+  <body>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="error-message"><%= error %></div>
+    <% } %> <% if (typeof message !== 'undefined' && message) { %>
+    <div class="message-message"><%= message %></div>
+    <% } %>
     <h1>Mot de passe oublié</h1>
     <form action="/motdepasseoublie" method="post">
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email" required />
-        <button type="submit">Réinitialiser le mot de passe</button>
+      <label for="email">Email</label>
+      <input type="email" name="email" id="email" required />
+      <button type="submit">Réinitialiser le mot de passe</button>
     </form>
-</body>
+  </body>
 </html>
