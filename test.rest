@@ -1,0 +1,29 @@
+GET http://localhost:8080/users
+
+###
+POST http://localhost:8080/users?nom=baalla&prenom=ee&email=zaeaze@gmail.com&password=azeazed
+
+###
+GET http://localhost:8080
+
+### 
+POST http://localhost:8080/users
+
+Content-Type: application/json
+
+{
+    nom: 'baalla',
+    prenom: 'baalla',
+    email: 'baalla@gmail.com',
+    password: 'baalla',
+}
+
+### 
+POST http://localhost:8080/connexion
+
+Content-Type: application/json
+
+{
+    email: 'baalla@gmail.com',
+    password: 'baalla',
+}

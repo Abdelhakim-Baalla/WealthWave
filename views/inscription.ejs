@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+  </head>
+  <body>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="error-message"><%= error %></div>
+    <% } %> <% if (typeof message !== 'undefined' && message) { %>
+    <div class="message-message"><%= message %></div>
+    <% } %>
+
+    <form action="/users" method="post">
+      <label for="nom">Nom</label>
+      <input
+        type="text"
+        name="nom"
+        id="nom"
+        value="<%= typeof nom !== 'undefined' ? nom : '' %>"
+      /><br />
+      <label for="prenom">Prenom</label>
+      <input
+        type="text"
+        name="prenom"
+        id="prenom"
+        value="<%= typeof prenom !== 'undefined' ? prenom : '' %>"
+      /><br />
+      <label for="email">Email</label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        value="<%= typeof email !== 'undefined' ? email : '' %>"
+      /><br />
+      <label for="password">Password</label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        value="<%= typeof password !== 'undefined' ? password : '' %>"
+      /><br />
+      <label for="terms"
+        >Accepte les terms et les conditions d'utilisations</label
+      >
+      <input type="checkbox" name="terms" id="terms" />
+      <button type="submit">Inscrire</button>
+    </form>
+
+    <a href="/connexion">Connectez</a>
+  </body>
+</html>
