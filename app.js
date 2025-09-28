@@ -283,10 +283,61 @@ app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
 app.get("/restorer-mot-de-passe", nonConnecte, (req, res) => {
   const { token, email } = req.query;
   const newEmail = encodeURIComponent(email);
-  res.render('restorationDeMotDePasse', {
+  res.render("restorationDeMotDePasse", {
     token,
-    newEmail
+    newEmail,
   });
+});
+
+app.post("/restorer-mot-de-passe", nonConnecte, async (req, res) => {
+  const { token, email } = req.query;
+  const { newPassword } = req.body;
+  const newEmail = encodeURIComponent(email);
+  const utilisateurExist = await utilisateurs.findOne({
+    where: { email: email },
+  });
+
+  if (utilisateurExist) {
+    if (newPassword.length < 8) {
+      return res.render("restorer-mot-de-passe", {
+        error: "Le mot de passe doit contient 8 caracteres ou plus",
+        token,
+        newEmail,
+      });
+    }
+
+    const restorationToken = await motDePasseRestorationTokens.findOne({
+      where: {
+        utilisateur: utilisateurExist.id,
+        date_expiration: { [Sequelize.Op.gt]: Date.now() },
+      },
+    });
+
+    if (!restorationToken) {
+      throw new Error("Errreur");
+    }
+
+    const vraiToken = await bcrypt.compare(token, restorationToken.token);
+
+    if (!vraiToken) {
+      throw new Error("Token invalide");
+    }
+
+    utilisateurs.password = await bcrypt.hash(newPassword, 10);
+    await utilisateurs.save();
+
+    await MotDePasseRestorationToken.destroy({
+      where: { id: restorationToken.id },
+    });
+
+    return res.redirect("/connexion");
+  } else {
+    return res.render("restorer-mot-de-passe", {
+      error: "l'email que vous entrer et incorrect",
+      token,
+      newEmail,
+    });
+  }
 });
 
 app.use((req, res, next) => {
