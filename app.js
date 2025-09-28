@@ -1,6 +1,7 @@
 const express = require("express");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 const app = express();
 const { utilisateurs } = require("./models");
 const port = 8080;
@@ -218,8 +219,17 @@ app.get("/motdepasseoublie", nonConnecte, (req, res) => {
   res.render("motdepasseoublie");
 });
 
-app.post("/motdepasseoublie", nonConnecte, (req, res) => {
-  
+app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
+  const { email } = req.body;
+  const emailExist = await utilisateurs.findOne({
+    where: {
+      email: email,
+    },
+  });
+
+  if(emailExist){
+    
+  }
 });
 
 app.use((req, res, next) => {
