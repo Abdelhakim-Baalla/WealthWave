@@ -218,6 +218,10 @@ app.get("/motdepasseoublie", nonConnecte, (req, res) => {
   res.render("motdepasseoublie");
 });
 
+app.post("/motdepasseoublie", nonConnecte, (req, res) => {
+  
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
