@@ -3,6 +3,7 @@ const express = require("express");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
+const { generateSecureToken } = require('n-digit-token');
 const app = express();
 const { utilisateurs } = require("./models");
 const port = 8080;
@@ -238,6 +239,12 @@ app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
         pass: process.env.SMTP_PASS,
       },
     });
+
+    const token = generateSecureToken(10);
+    const dateExpirationDeToken = Date.now() + 60000;
+
+    console.log('token: ', token);
+    console.log('date Expiration: ', dateExpirationDeToken);
 
     async function envoyerEmail() {
       try {
