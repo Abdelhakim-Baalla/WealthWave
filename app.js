@@ -273,6 +273,10 @@ app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
     envoyerEmail();
 
     res.render("emailEnvoieSuccess");
+  } else {
+    res.render("motdepasseoublie", {
+      error: "l'email que vous entrer et incorrect",
+    });
   }
 });
 
