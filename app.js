@@ -281,7 +281,12 @@ app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
 });
 
 app.get("/restorer-mot-de-passe", nonConnecte, (req, res) => {
-  res.render('restorationDeMotDePasse');
+  const { token, email } = req.query;
+  const newEmail = encodeURIComponent(email);
+  res.render('restorationDeMotDePasse', {
+    token,
+    newEmail
+  });
 });
 
 app.use((req, res, next) => {
