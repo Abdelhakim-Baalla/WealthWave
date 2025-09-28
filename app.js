@@ -238,6 +238,20 @@ app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
         pass: process.env.SMTP_PASS,
       },
     });
+
+    async function envoyerEmail() {
+      try {
+        let info = await transporter.sendMail({
+          from: '"WealthWave Team" <process.env.SMTP_USER>',
+          to: email,
+          subject: "Réinisialiser Votre mot de passe",
+          text: "liekn",
+        });
+      } catch (error) {
+        console.error("Problème et servenu: ", error);
+      }
+    }
+    envoyerEmail();
   }
 });
 
