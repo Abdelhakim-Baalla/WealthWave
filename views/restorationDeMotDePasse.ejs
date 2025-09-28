@@ -11,11 +11,20 @@
     <% } %> <% if (typeof message !== 'undefined' && message) { %>
     <div class="message-message"><%= message %></div>
     <% } %>
-    <h1>Restoration de mot de passe </h1>
-    <form action="/restorer-mot-de-passe?token=<%= token %>&email=<%= newEmail %>" method="post">
+    <h1>Restoration de mot de passe</h1>
+    <form
+      action="/restorer-mot-de-passe?token=<%= token %>&email=<%= newEmail %>"
+      method="post"
+    >
       <label for="newPassword">Nouveaux mot de passe</label>
       <input type="password" name="newPassword" id="newPassword" required />
       <button type="submit">Réinitialiser le mot de passe</button>
     </form>
+    <% if (typeof resend !== 'undefined' && resend) { %>
+    <form action="/motdepasseoublie" method="post">
+      <input type="hidden" name="email" value="<%= newEmail %>" />
+      <button type="submit">Renvoyer l'email de réinitialisation</button>
+    </form>
+    <% } %>
   </body>
 </html>

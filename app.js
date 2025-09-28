@@ -4,6 +4,7 @@ const session = require("express-session");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const { generateSecureToken } = require("n-digit-token");
+const { Sequelize } = require("sequelize");
 const app = express();
 const { utilisateurs } = require("./models");
 const { motDePasseRestorationTokens } = require("./models");
@@ -253,9 +254,7 @@ app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
 
     const restorationLien = `${
       process.env.APP_URL
-    }/restorer-mot-de-passe?token=${tokenHasher}&email=${encodeURIComponent(
-      email
-    )}`;
+    }/restorer-mot-de-passe?token=${token}&email=${encodeURIComponent(email)}`;
 
     async function envoyerEmail() {
       try {
@@ -299,7 +298,7 @@ app.post("/restorer-mot-de-passe", nonConnecte, async (req, res) => {
 
   if (utilisateurExist) {
     if (newPassword.length < 8) {
-      return res.render("restorer-mot-de-passe", {
+      return res.render("restorationDeMotDePasse", {
         error: "Le mot de passe doit contient 8 caracteres ou plus",
         token,
         newEmail,
@@ -314,25 +313,37 @@ app.post("/restorer-mot-de-passe", nonConnecte, async (req, res) => {
     });
 
     if (!restorationToken) {
-      throw new Error("Errreur");
+      return res.render("restorationDeMotDePasse", {
+        error:
+          "Le lien de réinitialisation a expiré ou est invalide. Veuillez demander un nouvel email.",
+        token,
+        newEmail,
+        resend: true,
+      });
     }
 
     const vraiToken = await bcrypt.compare(token, restorationToken.token);
 
     if (!vraiToken) {
-      throw new Error("Token invalide");
+      return res.render("restorationDeMotDePasse", {
+        error:
+          "Le token est invalide. Veuillez demander un nouvel email de réinitialisation.",
+        token,
+        newEmail,
+        resend: true,
+      });
     }
 
-    utilisateurs.password = await bcrypt.hash(newPassword, 10);
-    await utilisateurs.save();
+    utilisateurExist.password = await bcrypt.hash(newPassword, 10);
+    await utilisateurExist.save();
 
-    await MotDePasseRestorationToken.destroy({
+    await motDePasseRestorationTokens.destroy({
       where: { id: restorationToken.id },
     });
 
     return res.redirect("/connexion");
   } else {
-    return res.render("restorer-mot-de-passe", {
+    return res.render("restorationDeMotDePasse", {
       error: "l'email que vous entrer et incorrect",
       token,
       newEmail,
