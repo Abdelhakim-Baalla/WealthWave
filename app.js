@@ -245,11 +245,17 @@ app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
     const tokenHasher = await bcrypt.hash(token, 10);
     const dateExpirationDeToken = Date.now() + 60000;
 
-    await motDePasseRestorationTokens.create({ 
-      utilisateur: emailExist.id, 
-      token: tokenHasher, 
-      date_expiration: dateExpirationDeToken
+    await motDePasseRestorationTokens.create({
+      utilisateur: emailExist.id,
+      token: tokenHasher,
+      date_expiration: dateExpirationDeToken,
     });
+
+    const restorationLien = `${
+      process.env.APP_URL
+    }/restorer-mot-de-passe?token=${tokenHasher}&email=${encodeURIComponent(
+      email
+    )}`;
 
     async function envoyerEmail() {
       try {
@@ -257,13 +263,16 @@ app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
           from: '"WealthWave Team" <process.env.SMTP_USER>',
           to: email,
           subject: "Réinisialiser Votre mot de passe",
-          text: "liekn",
+          text: `Vous avez demandé une réinitialisation de mot de passe.\nCliquez ici : ${restorationLien}\nCe lien expire dans 1 minute.`,
+          html: `<p>Vous avez demandé une réinitialisation de mot de passe.</p><p> cliquez ici : <a href="${restorationLien}">Réinitialiser le mot de passe</a></p><p>Ce lien expire dans 1 minute.</p>`,
         });
       } catch (error) {
         console.error("Problème et servenu: ", error);
       }
     }
     envoyerEmail();
+
+    res.render("emailEnvoieSuccess");
   }
 });
 
