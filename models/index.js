@@ -5,6 +5,7 @@ const objectifs = require("./objectifs");
 const notifications = require("./notifications");
 const categories = require("./categories");
 const budgets = require("./budgets");
+const motDePasseRestorationTokens = require("./motDePasseRestorationTokens");
 
 utilisateurs.hasMany(transactions, {
   foreignKey: "utilisateur",
@@ -58,6 +59,13 @@ budgets.belongsTo(categories, {
   foreignKey: "categorie",
 });
 
+utilisateurs.hasMany(motDePasseRestorationTokens, {
+  foreignKey: "utilisateur",
+});
+motDePasseRestorationTokens.belongsTo(utilisateurs, {
+  foreignKey: "utilisateur",
+});
+
 (async () => {
   await database.sync({ force: false });
   console.log("Database synced");
@@ -76,4 +84,5 @@ module.exports = {
   notifications,
   categories,
   budgets,
+  motDePasseRestorationTokens,
 };

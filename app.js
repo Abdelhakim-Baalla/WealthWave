@@ -1,8 +1,13 @@
+require("dotenv").config();
 const express = require("express");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+const { generateSecureToken } = require("n-digit-token");
+const { Sequelize } = require("sequelize");
 const app = express();
 const { utilisateurs } = require("./models");
+const { motDePasseRestorationTokens } = require("./models");
 const port = 8080;
 
 app.set("view engine", "ejs");
@@ -210,6 +215,138 @@ app.post("/profile", estConnecte, async (req, res) => {
       utilisateur: await utilisateurs.findByPk(req.session.utilisateurId),
       error:
         "Une erreur s'est produite lors de la mise à jour. Veuillez réessayer.",
+    });
+  }
+});
+
+app.get("/motdepasseoublie", nonConnecte, (req, res) => {
+  res.render("motdepasseoublie");
+});
+
+app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
+  const { email } = req.body;
+  const emailExist = await utilisateurs.findOne({
+    where: {
+      email: email,
+    },
+  });
+
+  if (emailExist) {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    const token = generateSecureToken(10);
+    const tokenHasher = await bcrypt.hash(token, 10);
+    const dateExpirationDeToken = Date.now() + 60000;
+
+    await motDePasseRestorationTokens.create({
+      utilisateur: emailExist.id,
+      token: tokenHasher,
+      date_expiration: dateExpirationDeToken,
+    });
+
+    const restorationLien = `${
+      process.env.APP_URL
+    }/restorer-mot-de-passe?token=${token}&email=${encodeURIComponent(email)}`;
+
+    async function envoyerEmail() {
+      try {
+        let info = await transporter.sendMail({
+          from: '"WealthWave Team" <process.env.SMTP_USER>',
+          to: email,
+          subject: "Réinisialiser Votre mot de passe",
+          text: `Vous avez demandé une réinitialisation de mot de passe.\nCliquez ici : ${restorationLien}\nCe lien expire dans 1 minute.`,
+          html: `<p>Vous avez demandé une réinitialisation de mot de passe.</p><p> cliquez ici : <a href="${restorationLien}">Réinitialiser le mot de passe</a></p><p>Ce lien expire dans 1 minute.</p>`,
+        });
+      } catch (error) {
+        console.error("Problème et servenu: ", error);
+      }
+    }
+    envoyerEmail();
+
+    res.render("emailEnvoieSuccess");
+  } else {
+    res.render("motdepasseoublie", {
+      error: "l'email que vous entrer et incorrect",
+    });
+  }
+});
+
+app.get("/restorer-mot-de-passe", nonConnecte, (req, res) => {
+  const { token, email } = req.query;
+  const newEmail = encodeURIComponent(email);
+  res.render("restorationDeMotDePasse", {
+    token,
+    newEmail,
+  });
+});
+
+app.post("/restorer-mot-de-passe", nonConnecte, async (req, res) => {
+  const { token, email } = req.query;
+  const { newPassword } = req.body;
+  const newEmail = encodeURIComponent(email);
+  const utilisateurExist = await utilisateurs.findOne({
+    where: { email: email },
+  });
+
+  if (utilisateurExist) {
+    if (newPassword.length < 8) {
+      return res.render("restorationDeMotDePasse", {
+        error: "Le mot de passe doit contient 8 caracteres ou plus",
+        token,
+        newEmail,
+      });
+    }
+
+    const restorationToken = await motDePasseRestorationTokens.findOne({
+      where: {
+        utilisateur: utilisateurExist.id,
+        date_expiration: { [Sequelize.Op.gt]: Date.now() },
+      },
+    });
+
+    if (!restorationToken) {
+      return res.render("restorationDeMotDePasse", {
+        error:
+          "Le lien de réinitialisation a expiré ou est invalide. Veuillez demander un nouvel email.",
+        token,
+        newEmail,
+        resend: true,
+      });
+    }
+
+    const vraiToken = await bcrypt.compare(token, restorationToken.token);
+
+    if (!vraiToken) {
+      return res.render("restorationDeMotDePasse", {
+        error:
+          "Le token est invalide. Veuillez demander un nouvel email de réinitialisation.",
+        token,
+        newEmail,
+        resend: true,
+      });
+    }
+
+    utilisateurExist.password = await bcrypt.hash(newPassword, 10);
+    await utilisateurExist.save();
+
+    await motDePasseRestorationTokens.destroy({
+      where: { id: restorationToken.id },
+    });
+
+    return res.redirect("/connexion");
+  } else {
+    return res.render("restorationDeMotDePasse", {
+      error: "l'email que vous entrer et incorrect",
+      token,
+      newEmail,
     });
   }
 });
