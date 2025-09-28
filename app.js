@@ -3,9 +3,10 @@ const express = require("express");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
-const { generateSecureToken } = require('n-digit-token');
+const { generateSecureToken } = require("n-digit-token");
 const app = express();
 const { utilisateurs } = require("./models");
+const { motDePasseRestorationTokens } = require("./models");
 const port = 8080;
 
 app.set("view engine", "ejs");
@@ -241,10 +242,14 @@ app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
     });
 
     const token = generateSecureToken(10);
+    const tokenHasher = await bcrypt.hash(token, 10);
     const dateExpirationDeToken = Date.now() + 60000;
 
-    console.log('token: ', token);
-    console.log('date Expiration: ', dateExpirationDeToken);
+    await motDePasseRestorationTokens.create({ 
+      utilisateur: emailExist.id, 
+      token: tokenHasher, 
+      date_expiration: dateExpirationDeToken
+    });
 
     async function envoyerEmail() {
       try {
