@@ -280,6 +280,10 @@ app.post("/motdepasseoublie", nonConnecte, async (req, res) => {
   }
 });
 
+app.get("/restorer-mot-de-passe", nonConnecte, (req, res) => {
+  res.render('restorationDeMotDePasse');
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
