@@ -11,8 +11,8 @@
     <% } %> <% if (typeof message !== 'undefined' && message) { %>
     <div class="message-message"><%= message %></div>
     <% } %>
-    <h1>Restoration de mot de passe</h1>
-    <form action="/restorer-mot-de-passe" method="post">
+    <h1>Restoration de mot de passe </h1>
+    <form action="/restorer-mot-de-passe?token=<%= token %>&email=<%= newEmail %>" method="post">
       <label for="newPassword">Nouveaux mot de passe</label>
       <input type="password" name="newPassword" id="newPassword" required />
       <button type="submit">Réinitialiser le mot de passe</button>
