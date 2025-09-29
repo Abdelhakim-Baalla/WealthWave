@@ -6,7 +6,7 @@ const nodemailer = require("nodemailer");
 const { generateSecureToken } = require("n-digit-token");
 const { Sequelize } = require("sequelize");
 const app = express();
-const { utilisateurs, categories } = require("./models");
+const { utilisateurs, categories, transactions } = require("./models");
 const { motDePasseRestorationTokens } = require("./models");
 // const { categories } = require("./models");
 const port = 8080;
@@ -360,7 +360,7 @@ app.get("/ajouter-transaction", estConnecte, async (req, res) => {
   });
 });
 
-app.post("/ajouter-transaction", nonConnecte, async (req, res) => {
+app.post("/ajouter-transaction", estConnecte, async (req, res) => {
   const { type, prix, date, categorie, note } = req.body;
   const toutCategories = await categories.findAll();
 
@@ -392,9 +392,11 @@ app.post("/ajouter-transaction", nonConnecte, async (req, res) => {
   }
 
   let categorieExist = false;
+  let categorieId;
   for (let uneCategorie of toutCategories) {
     if (uneCategorie.nom == categorie) {
       categorieExist = true;
+      categorieId = uneCategorie.id;
     }
   }
 
@@ -413,6 +415,26 @@ app.post("/ajouter-transaction", nonConnecte, async (req, res) => {
       toutCategories,
     });
   }
+
+  try {
+    await transactions.create({
+      type,
+      prix,
+      date,
+      utilisateur: req.session.utilisateurId,
+      categorie: categorieId,
+      note,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.render("transactions/ajouter", {
+      title: "WealthWave - Ajouter Transaction",
+      error: error,
+      toutCategories,
+    });
+  }
+
+  return res.redirect("/transactions");
 });
 
 app.use((req, res, next) => {
