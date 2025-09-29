@@ -39,9 +39,29 @@
           </td>
           <td><strong><%= transaction.type %></strong></td>
           <td><em><%= transaction.prix %> <%= utilisateur.devise %></em></td>
+          <td>
+            <form
+              action="/transactions/modifier"
+              method="get"
+              style="display: inline"
+            >
+              <input type="hidden" name="id" value="<%= transaction.id %>" />
+              <button type="submit">Modifier</button>
+            </form>
+            <form
+              action="/transactions/supprimer"
+              method="post"
+              style="display: inline"
+            >
+              <input type="hidden" name="id" value="<%= transaction.id %>" />
+              <button type="submit">Supprimer</button>
+            </form>
+          </td>
         </tr>
         <% } %>
       </tbody>
     </table>
+
+    <a href="/ajouter-transaction">Ajouter une transaction</a>
   </body>
 </html>
