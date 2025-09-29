@@ -592,13 +592,45 @@ app.post("/transactions/modifier", estConnecte, async (req, res) => {
   await transaction.save();
 
   res.redirect("/transactions");
-
 });
 
 app.get("/categorie/ajouter", estConnecte, async (req, res) => {
-  res.render('categories/ajouter', {
+  res.render("categories/ajouter", {
     title: "WealthWave - Ajouter Categorie",
   });
+});
+
+app.post("/categorie/ajouter", estConnecte, async (req, res) => {
+  const { nom } = req.body;
+  const allCategories = await categories.findAll();
+  let categorieExist = false;
+
+  for (let categorie of allCategories) {
+    if (categorie.nom == nom) {
+      categorieExist = true;
+    }
+  }
+
+  if (categorieExist) {
+    return res.render("categories/ajouter", {
+      title: "WealthWave - Ajouter Categorie",
+      error: "Cette Categorie et exist déja",
+    });
+  }
+
+  try {
+    await categories.create({
+      nom,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.render("categories/ajouter", {
+      title: "WealthWave - Ajouter Categorie",
+      error: "Error et servenu",
+    });
+  }
+
+  return res.redirect("/categories");
 });
 
 app.use((req, res, next) => {
