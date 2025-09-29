@@ -12,8 +12,30 @@
     <div class="message-message"><%= message %></div>
     <% } %>
 
-    
+    <h1>Transactions</h1>
+    <div>
+      <table></table>
+      <% for(let transaction of toutTransactions) { %>
+      <div>
+        <div>
+          <%= transaction.date %>
+        </div>
+        <div>
+          <div><%= transaction.categorie.nom %></div>
+          <div>
+            <%= typeof transaction.note !== 'undefined' ? transaction.note : ''
+            %>
+          </div>
+          <div>
+            <h3><%= transaction.type %></h3>
+          </div>
+          <div>
+            <i><%= transaction.prix %></i>
+          </div>
+        </div>
+      </div>
 
-    
+      <% } %>
+    </div>
   </body>
 </html>
