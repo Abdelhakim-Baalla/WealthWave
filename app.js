@@ -420,7 +420,7 @@ app.post("/ajouter-transaction", estConnecte, async (req, res) => {
     await transactions.create({
       type,
       prix,
-      date,
+      date: new Date(date),
       utilisateur: req.session.utilisateurId,
       categorie: categorieId,
       note,
@@ -435,6 +435,164 @@ app.post("/ajouter-transaction", estConnecte, async (req, res) => {
   }
 
   return res.redirect("/transactions");
+});
+
+app.get("/transactions", estConnecte, async (req, res) => {
+  const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
+  const toutTransactions = await transactions.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+    order: [
+      ["date", "DESC"],
+      ["id", "DESC"],
+    ],
+  });
+
+  for (let index = 0; index < toutTransactions.length; index++) {
+    let categorieChanger = await categories.findOne({
+      where: {
+        id: toutTransactions[index].categorie,
+      },
+    });
+    toutTransactions[index].categorie = categorieChanger;
+  }
+
+  res.render("transactions/index", {
+    title: "WealthWave - Transactions",
+    toutTransactions,
+    utilisateur,
+  });
+});
+
+app.post("/transactions/supprimer", estConnecte, async (req, res) => {
+  const { id } = req.body;
+  const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
+  const toutTransactions = await transactions.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+
+  try {
+    await transactions.destroy({
+      where: {
+        id,
+        utilisateur: req.session.utilisateurId,
+      },
+    });
+    return res.redirect("/transactions");
+  } catch (error) {
+    console.log(error);
+    return res.render("transactions/index", {
+      title: "WealthWave - Transactions",
+      error:
+        "Une erreur est survenueez lors de la suppression de la transaction.",
+      toutTransactions,
+      utilisateur,
+    });
+  }
+});
+
+app.get("/transactions/modifier", estConnecte, async (req, res) => {
+  const { id } = req.query;
+  const transactionSpecifier = await transactions.findByPk(id);
+  const toutCategories = await categories.findAll();
+
+  function formaterDatePourInput(date) {
+    if (!date) return "";
+    const d = new Date(date);
+    const timezoneOffset = d.getTimezoneOffset() * 60000;
+    const localDate = new Date(d.getTime() - timezoneOffset);
+    return localDate.toISOString().slice(0, 16);
+  }
+
+  if (transactionSpecifier && transactionSpecifier.date) {
+    transactionSpecifier.dateFormatted = formaterDatePourInput(
+      transactionSpecifier.date
+    );
+  }
+
+  res.render("transactions/modifier", {
+    title: "WealthWave - Modifier Transaction",
+    toutCategories,
+    transactionSpecifier,
+  });
+});
+
+app.post("/transactions/modifier", estConnecte, async (req, res) => {
+  const { id, type, prix, date, categorie, note } = req.body;
+  const transaction = await transactions.findByPk(id);
+  const toutCategories = await categories.findAll();
+  const transactionSpecifier = transaction;
+
+  if (
+    (type != "Revenu" && type != "Frais" && type != "Transfert") ||
+    type == ""
+  ) {
+    return res.render("transactions/modifier", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Il faut selectionnez just les type proposer",
+      toutCategories,
+      transactionSpecifier,
+    });
+  }
+
+  if (prix <= 0 || prix == "") {
+    return res.render("transactions/modifier", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Il faut selectionnez un prix positif",
+      toutCategories,
+      transactionSpecifier,
+    });
+  }
+
+  if (date == "") {
+    return res.render("transactions/modifier", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Saiser une Date",
+      toutCategories,
+      transactionSpecifier,
+    });
+  }
+
+  let categorieExist = false;
+  let categorieId;
+  for (let uneCategorie of toutCategories) {
+    if (uneCategorie.nom == categorie) {
+      categorieExist = true;
+      categorieId = uneCategorie.id;
+    }
+  }
+
+  if (categorie == "") {
+    return res.render("transactions/modifier", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Selectionner une categorie",
+      toutCategories,
+      transactionSpecifier,
+    });
+  }
+
+  if (!categorieExist) {
+    return res.render("transactions/modifier", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "La categories saisez n'exist pas",
+      toutCategories,
+      transactionSpecifier,
+    });
+  }
+
+  transaction.type = type;
+  transaction.prix = prix;
+  transaction.date = new Date(date);
+  transaction.categorie = categorieId;
+  transaction.note = note;
+
+  await transaction.save();
+
+  res.redirect("/transactions");
+
 });
 
 app.use((req, res, next) => {

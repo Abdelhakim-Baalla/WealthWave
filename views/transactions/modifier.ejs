@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+  </head>
+  <body>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="error-message"><%= error %></div>
+    <% } %> <% if (typeof message !== 'undefined' && message) { %>
+    <div class="message-message"><%= message %></div>
+    <% } %>
+
+    <form action="/transactions/modifier" method="post">
+      <b>Type Des Transactions</b>
+      <label for="Revenu">Revenu</label>
+      <input type="radio" name="type" id="Revenu" value="Revenu" <%=
+      transactionSpecifier.type == 'Revenu' ? "checked" : '' %> /><br />
+      <label for="Frais">Frais</label>
+      <input type="radio" name="type" id="Frais" value="Frais" <%=
+      transactionSpecifier.type == 'Frais' ? "checked" : '' %> /><br />
+      <label for="Transfert">Transfert</label>
+      <input type="radio" name="type" id="Transfert" value="Transfert" <%=
+      transactionSpecifier.type == 'Transfert' ? "checked" : '' %> /><br />
+      <hr />
+
+      <label for="prix">Prix</label>
+      <input
+        type="number"
+        name="prix"
+        id="prix"
+        value="<%= typeof transactionSpecifier.prix !== 'undefined' ? transactionSpecifier.prix : '' %>"
+      /><br />
+      <hr />
+
+      <label for="date">Date</label>
+      <input
+        type="datetime-local"
+        name="date"
+        id="date"
+        value="<%= transactionSpecifier.dateFormatted %>"
+        required
+      /><br />
+      <hr />
+
+      <label for="categorie">Categorie</label>
+      <select name="categorie" id="categorie">
+        <option value=""></option>
+        <% for(let categorie of toutCategories) { %>
+        <option value="<%= categorie.nom %>" <%= transactionSpecifier.categorie == categorie.id ? "selected" : '' %> ><%= categorie.nom %></option>
+        <% } %>
+      </select>
+      <hr />
+
+      <label for="note">Note</label><br />
+      <textarea name="note" id="note" cols="50" rows="10"><%= typeof transactionSpecifier.note !== 'undefined' ? transactionSpecifier.note : '' %></textarea
+      ><br />
+      <hr />
+
+      <input type="hidden" name="id" value="<%= transactionSpecifier.id %>" />
+      <button type="submit">Modifier Transaction</button>
+    </form>
+    <form
+      action="/transactions/supprimer"
+      method="post"
+      style="display: inline"
+    >
+      <input type="hidden" name="id" value="<%= transactionSpecifier.id %>" />
+      <button type="submit">Supprimer</button>
+    </form>
+
+    <a href="/transactions">Retourner Au transactions</a>
+  </body>
+</html>

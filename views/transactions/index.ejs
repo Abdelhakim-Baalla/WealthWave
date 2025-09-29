@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+  </head>
+  <body>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="error-message"><%= error %></div>
+    <% } %> <% if (typeof message !== 'undefined' && message) { %>
+    <div class="message-message"><%= message %></div>
+    <% } %>
+
+    <h1>Transactions</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Category</th>
+          <th>Note</th>
+          <th>Type</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for(let transaction of toutTransactions) { %>
+        <tr>
+          <td>
+            <% if (transaction.date instanceof Date) { %> <%=
+            transaction.date.toLocaleString('fr-FR', { day: '2-digit', month:
+            '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+            <% } else { %> <%= transaction.date %> <% } %>
+          </td>
+          <td><%= transaction.categorie.nom %></td>
+          <td>
+            <%= typeof transaction.note !== 'undefined' ? transaction.note : ''
+            %>
+          </td>
+          <td><strong><%= transaction.type %></strong></td>
+          <td><em><%= transaction.prix %> <%= utilisateur.devise %></em></td>
+          <td>
+            <form
+              action="/transactions/modifier"
+              method="get"
+              style="display: inline"
+            >
+              <input type="hidden" name="id" value="<%= transaction.id %>" />
+              <button type="submit">Modifier</button>
+            </form>
+            <form
+              action="/transactions/supprimer"
+              method="post"
+              style="display: inline"
+            >
+              <input type="hidden" name="id" value="<%= transaction.id %>" />
+              <button type="submit">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+    <a href="/ajouter-transaction">Ajouter une transaction</a>
+    <a href="/profile">Profile</a>
+  </body>
+</html>
