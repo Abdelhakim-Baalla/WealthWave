@@ -656,6 +656,20 @@ app.get("/categories", estConnecte, async (req, res) => {
   });
 });
 
+app.get("/categorie/modifier", estConnecte, async (req, res) => {
+  const { id } = req.query;
+  const categorie = await categories.findByPk(id);
+
+  if (!categorie) {
+    return res.redirect("/categories");
+  }
+
+  res.render("categories/modifier", {
+    title: "WealthWave - Modifier Categorie",
+    categorie,
+  });
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
