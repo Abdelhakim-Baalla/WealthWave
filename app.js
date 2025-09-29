@@ -352,12 +352,67 @@ app.post("/restorer-mot-de-passe", nonConnecte, async (req, res) => {
   }
 });
 
-app.get("/ajouter-transaction", nonConnecte, async (req, res) => {
+app.get("/ajouter-transaction", estConnecte, async (req, res) => {
   const toutCategories = await categories.findAll();
   res.render("transactions/ajouter", {
     title: "WealthWave - Ajouter Transaction",
-    toutCategories
+    toutCategories,
   });
+});
+
+app.post("/ajouter-transaction", nonConnecte, async (req, res) => {
+  const { type, prix, date, categorie, note } = req.body;
+  const toutCategories = await categories.findAll();
+
+  if (
+    (type != "Revenu" && type != "Frais" && type != "Transfert") ||
+    type == ""
+  ) {
+    return res.render("transactions/ajouter", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Il faut selectionnez just les type proposer",
+      toutCategories,
+    });
+  }
+
+  if (prix <= 0 || prix == "") {
+    return res.render("transactions/ajouter", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Il faut selectionnez un prix positif",
+      toutCategories,
+    });
+  }
+
+  if (date == "") {
+    return res.render("transactions/ajouter", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Saiser une Date",
+      toutCategories,
+    });
+  }
+
+  let categorieExist = false;
+  for (let uneCategorie of toutCategories) {
+    if (uneCategorie.nom == categorie) {
+      categorieExist = true;
+    }
+  }
+
+  if (categorie == "") {
+    return res.render("transactions/ajouter", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Selectionner une categorie",
+      toutCategories,
+    });
+  }
+
+  if (!categorieExist) {
+    return res.render("transactions/ajouter", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "La categories saisez n'exist pas",
+      toutCategories,
+    });
+  }
 });
 
 app.use((req, res, next) => {
