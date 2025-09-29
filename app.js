@@ -633,6 +633,29 @@ app.post("/categorie/ajouter", estConnecte, async (req, res) => {
   return res.redirect("/categories");
 });
 
+app.get("/categories", estConnecte, async (req, res) => {
+  const allCategories = await categories.findAll();
+
+  function formaterDatePourAfficher(date) {
+    if (!date) return "";
+    const d = new Date(date);
+    const timezoneOffset = d.getTimezoneOffset() * 60000;
+    const localDate = new Date(d.getTime() - timezoneOffset);
+    return localDate.toISOString().slice(0, 16);
+  }
+
+  for (let categorie of allCategories) {
+    if (categorie && categorie.createdAt) {
+      categorie.date = formaterDatePourAfficher(categorie.createdAt);
+    }
+  }
+
+  res.render("categories/index", {
+    title: "WealthWave - Categories",
+    allCategories,
+  });
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
