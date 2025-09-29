@@ -438,6 +438,7 @@ app.post("/ajouter-transaction", estConnecte, async (req, res) => {
 });
 
 app.get("/transactions", estConnecte, async (req, res) => {
+  const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
   const toutTransactions = await transactions.findAll({
     where: {
       utilisateur: req.session.utilisateurId,
@@ -460,6 +461,7 @@ app.get("/transactions", estConnecte, async (req, res) => {
   res.render("transactions/index", {
     title: "WealthWave - Transactions",
     toutTransactions,
+    utilisateur,
   });
 });
 
