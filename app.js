@@ -6,8 +6,9 @@ const nodemailer = require("nodemailer");
 const { generateSecureToken } = require("n-digit-token");
 const { Sequelize } = require("sequelize");
 const app = express();
-const { utilisateurs } = require("./models");
+const { utilisateurs, categories } = require("./models");
 const { motDePasseRestorationTokens } = require("./models");
+// const { categories } = require("./models");
 const port = 8080;
 
 app.set("view engine", "ejs");
@@ -349,6 +350,14 @@ app.post("/restorer-mot-de-passe", nonConnecte, async (req, res) => {
       newEmail,
     });
   }
+});
+
+app.get("/ajouter-transaction", nonConnecte, async (req, res) => {
+  const toutCategories = await categories.findAll();
+  res.render("transactions/ajouter", {
+    title: "WealthWave - Ajouter Transaction",
+    toutCategories
+  });
 });
 
 app.use((req, res, next) => {
