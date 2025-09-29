@@ -420,7 +420,7 @@ app.post("/ajouter-transaction", estConnecte, async (req, res) => {
     await transactions.create({
       type,
       prix,
-      date,
+      date: new Date(date),
       utilisateur: req.session.utilisateurId,
       categorie: categorieId,
       note,
@@ -449,13 +449,11 @@ app.get("/transactions", estConnecte, async (req, res) => {
   });
 
   for (let index = 0; index < toutTransactions.length; index++) {
-    // console.log(toutTransactions[index].categorie);
     let categorieChanger = await categories.findOne({
       where: {
         id: toutTransactions[index].categorie,
       },
     });
-
     toutTransactions[index].categorie = categorieChanger;
   }
 

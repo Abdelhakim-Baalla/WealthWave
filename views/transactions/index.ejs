@@ -26,7 +26,12 @@
       <tbody>
         <% for(let transaction of toutTransactions) { %>
         <tr>
-          <td><%= transaction.date %></td>
+          <td>
+            <% if (transaction.date instanceof Date) { %> <%=
+            transaction.date.toLocaleString('fr-FR', { day: '2-digit', month:
+            '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+            <% } else { %> <%= transaction.date %> <% } %>
+          </td>
           <td><%= transaction.categorie.nom %></td>
           <td>
             <%= typeof transaction.note !== 'undefined' ? transaction.note : ''
