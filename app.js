@@ -494,6 +494,32 @@ app.post("/transactions/supprimer", estConnecte, async (req, res) => {
   }
 });
 
+app.get("/transactions/modifier", estConnecte, async (req, res) => {
+  const { id } = req.query;
+  const transactionSpecifier = await transactions.findByPk(id);
+  const toutCategories = await categories.findAll();
+
+  function formaterDatePourInput(date) {
+    if (!date) return "";
+    const d = new Date(date);
+    const timezoneOffset = d.getTimezoneOffset() * 60000;
+    const localDate = new Date(d.getTime() - timezoneOffset);
+    return localDate.toISOString().slice(0, 16);
+  }
+
+  if (transactionSpecifier && transactionSpecifier.date) {
+    transactionSpecifier.dateFormatted = formaterDatePourInput(
+      transactionSpecifier.date
+    );
+  }
+
+  res.render("transactions/modifier", {
+    title: "WealthWave - Modifier Transaction",
+    toutCategories,
+    transactionSpecifier,
+  });
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
