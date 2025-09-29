@@ -595,6 +595,12 @@ app.post("/transactions/modifier", estConnecte, async (req, res) => {
 
 });
 
+app.get("/categorie/ajouter", estConnecte, async (req, res) => {
+  res.render('categories/ajouter', {
+    title: "WealthWave - Ajouter Categorie",
+  });
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
