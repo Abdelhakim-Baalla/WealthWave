@@ -437,6 +437,14 @@ app.post("/ajouter-transaction", estConnecte, async (req, res) => {
   return res.redirect("/transactions");
 });
 
+app.get("/transactions", estConnecte, async (req, res) => {
+  const toutTransactions = await transactions.findAll();
+  res.render('transactions/index', {
+    title: "WealthWave - Transactions",
+    toutTransactions,
+  });
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
