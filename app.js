@@ -6,8 +6,9 @@ const nodemailer = require("nodemailer");
 const { generateSecureToken } = require("n-digit-token");
 const { Sequelize } = require("sequelize");
 const app = express();
-const { utilisateurs } = require("./models");
+const { utilisateurs, categories, transactions } = require("./models");
 const { motDePasseRestorationTokens } = require("./models");
+// const { categories } = require("./models");
 const port = 8080;
 
 app.set("view engine", "ejs");
@@ -349,6 +350,91 @@ app.post("/restorer-mot-de-passe", nonConnecte, async (req, res) => {
       newEmail,
     });
   }
+});
+
+app.get("/ajouter-transaction", estConnecte, async (req, res) => {
+  const toutCategories = await categories.findAll();
+  res.render("transactions/ajouter", {
+    title: "WealthWave - Ajouter Transaction",
+    toutCategories,
+  });
+});
+
+app.post("/ajouter-transaction", estConnecte, async (req, res) => {
+  const { type, prix, date, categorie, note } = req.body;
+  const toutCategories = await categories.findAll();
+
+  if (
+    (type != "Revenu" && type != "Frais" && type != "Transfert") ||
+    type == ""
+  ) {
+    return res.render("transactions/ajouter", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Il faut selectionnez just les type proposer",
+      toutCategories,
+    });
+  }
+
+  if (prix <= 0 || prix == "") {
+    return res.render("transactions/ajouter", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Il faut selectionnez un prix positif",
+      toutCategories,
+    });
+  }
+
+  if (date == "") {
+    return res.render("transactions/ajouter", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Saiser une Date",
+      toutCategories,
+    });
+  }
+
+  let categorieExist = false;
+  let categorieId;
+  for (let uneCategorie of toutCategories) {
+    if (uneCategorie.nom == categorie) {
+      categorieExist = true;
+      categorieId = uneCategorie.id;
+    }
+  }
+
+  if (categorie == "") {
+    return res.render("transactions/ajouter", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Selectionner une categorie",
+      toutCategories,
+    });
+  }
+
+  if (!categorieExist) {
+    return res.render("transactions/ajouter", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "La categories saisez n'exist pas",
+      toutCategories,
+    });
+  }
+
+  try {
+    await transactions.create({
+      type,
+      prix,
+      date,
+      utilisateur: req.session.utilisateurId,
+      categorie: categorieId,
+      note,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.render("transactions/ajouter", {
+      title: "WealthWave - Ajouter Transaction",
+      error: error,
+      toutCategories,
+    });
+  }
+
+  return res.redirect("/transactions");
 });
 
 app.use((req, res, next) => {
