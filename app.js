@@ -438,8 +438,28 @@ app.post("/ajouter-transaction", estConnecte, async (req, res) => {
 });
 
 app.get("/transactions", estConnecte, async (req, res) => {
-  const toutTransactions = await transactions.findAll();
-  res.render('transactions/index', {
+  const toutTransactions = await transactions.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+    order: [
+      ["date", "DESC"],
+      ["id", "DESC"],
+    ],
+  });
+
+  for (let index = 0; index < toutTransactions.length; index++) {
+    // console.log(toutTransactions[index].categorie);
+    let categorieChanger = await categories.findOne({
+      where: {
+        id: toutTransactions[index].categorie,
+      },
+    });
+
+    toutTransactions[index].categorie = categorieChanger;
+  }
+
+  res.render("transactions/index", {
     title: "WealthWave - Transactions",
     toutTransactions,
   });
