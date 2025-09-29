@@ -13,29 +13,30 @@
     <% } %>
 
     <h1>Transactions</h1>
-    <div>
-      <table></table>
-      <% for(let transaction of toutTransactions) { %>
-      <div>
-        <div>
-          <%= transaction.date %>
-        </div>
-        <div>
-          <div><%= transaction.categorie.nom %></div>
-          <div>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Category</th>
+          <th>Note</th>
+          <th>Type</th>
+          <th>Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for(let transaction of toutTransactions) { %>
+        <tr>
+          <td><%= transaction.date %></td>
+          <td><%= transaction.categorie.nom %></td>
+          <td>
             <%= typeof transaction.note !== 'undefined' ? transaction.note : ''
             %>
-          </div>
-          <div>
-            <h3><%= transaction.type %></h3>
-          </div>
-          <div>
-            <i><%= transaction.prix %></i>
-          </div>
-        </div>
-      </div>
-
-      <% } %>
-    </div>
+          </td>
+          <td><strong><%= transaction.type %></strong></td>
+          <td><em><%= transaction.prix %></em></td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
   </body>
 </html>
