@@ -520,6 +520,81 @@ app.get("/transactions/modifier", estConnecte, async (req, res) => {
   });
 });
 
+app.post("/transactions/modifier", estConnecte, async (req, res) => {
+  const { id, type, prix, date, categorie, note } = req.body;
+  const transaction = await transactions.findByPk(id);
+  const toutCategories = await categories.findAll();
+  const transactionSpecifier = transaction;
+
+  if (
+    (type != "Revenu" && type != "Frais" && type != "Transfert") ||
+    type == ""
+  ) {
+    return res.render("transactions/modifier", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Il faut selectionnez just les type proposer",
+      toutCategories,
+      transactionSpecifier,
+    });
+  }
+
+  if (prix <= 0 || prix == "") {
+    return res.render("transactions/modifier", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Il faut selectionnez un prix positif",
+      toutCategories,
+      transactionSpecifier,
+    });
+  }
+
+  if (date == "") {
+    return res.render("transactions/modifier", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Saiser une Date",
+      toutCategories,
+      transactionSpecifier,
+    });
+  }
+
+  let categorieExist = false;
+  let categorieId;
+  for (let uneCategorie of toutCategories) {
+    if (uneCategorie.nom == categorie) {
+      categorieExist = true;
+      categorieId = uneCategorie.id;
+    }
+  }
+
+  if (categorie == "") {
+    return res.render("transactions/modifier", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Selectionner une categorie",
+      toutCategories,
+      transactionSpecifier,
+    });
+  }
+
+  if (!categorieExist) {
+    return res.render("transactions/modifier", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "La categories saisez n'exist pas",
+      toutCategories,
+      transactionSpecifier,
+    });
+  }
+
+  transaction.type = type;
+  transaction.prix = prix;
+  transaction.date = new Date(date);
+  transaction.categorie = categorieId;
+  transaction.note = note;
+
+  await transaction.save();
+
+  res.redirect("/transactions");
+
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
