@@ -592,7 +592,145 @@ app.post("/transactions/modifier", estConnecte, async (req, res) => {
   await transaction.save();
 
   res.redirect("/transactions");
+});
 
+app.get("/categorie/ajouter", estConnecte, async (req, res) => {
+  res.render("categories/ajouter", {
+    title: "WealthWave - Ajouter Categorie",
+  });
+});
+
+app.post("/categorie/ajouter", estConnecte, async (req, res) => {
+  const { nom } = req.body;
+  const allCategories = await categories.findAll();
+  let categorieExist = false;
+
+  for (let categorie of allCategories) {
+    if (categorie.nom == nom) {
+      categorieExist = true;
+    }
+  }
+
+  if (categorieExist) {
+    return res.render("categories/ajouter", {
+      title: "WealthWave - Ajouter Categorie",
+      error: "Cette Categorie et exist déja",
+    });
+  }
+
+  try {
+    await categories.create({
+      nom,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.render("categories/ajouter", {
+      title: "WealthWave - Ajouter Categorie",
+      error: "Error et servenu",
+    });
+  }
+
+  return res.redirect("/categories");
+});
+
+app.get("/categories", estConnecte, async (req, res) => {
+  const allCategories = await categories.findAll();
+
+  function formaterDatePourAfficher(date) {
+    if (!date) return "";
+    const d = new Date(date);
+    const timezoneOffset = d.getTimezoneOffset() * 60000;
+    const localDate = new Date(d.getTime() - timezoneOffset);
+    return localDate.toISOString().slice(0, 16);
+  }
+
+  for (let categorie of allCategories) {
+    if (categorie && categorie.createdAt) {
+      categorie.date = formaterDatePourAfficher(categorie.createdAt);
+    }
+  }
+
+  res.render("categories/index", {
+    title: "WealthWave - Categories",
+    allCategories,
+  });
+});
+
+app.get("/categorie/modifier", estConnecte, async (req, res) => {
+  const { id } = req.query;
+  const categorie = await categories.findByPk(id);
+
+  if (!categorie) {
+    return res.redirect("/categories");
+  }
+
+  res.render("categories/modifier", {
+    title: "WealthWave - Modifier Categorie",
+    categorie,
+  });
+});
+
+app.post("/categorie/modifier", estConnecte, async (req, res) => {
+  const { id, nom } = req.body;
+  const allCategories = await categories.findAll();
+  const categorieAModifier = await categories.findByPk(id);
+  let categorieExist = false;
+
+  if (allCategories) {
+    for (let categorie of allCategories) {
+      if (categorie.nom == nom) {
+        categorieExist = true;
+      }
+    }
+  }
+
+  if (categorieExist) {
+    function formaterDatePourAfficher(date) {
+      if (!date) return "";
+      const d = new Date(date);
+      const timezoneOffset = d.getTimezoneOffset() * 60000;
+      const localDate = new Date(d.getTime() - timezoneOffset);
+      return localDate.toISOString().slice(0, 16);
+    }
+
+    for (let categorie of allCategories) {
+      if (categorie && categorie.createdAt) {
+        categorie.date = formaterDatePourAfficher(categorie.createdAt);
+      }
+    }
+    return res.render("categories", {
+      title: "WealthWave - Categories",
+      error: "Cette Categorie et exist déja",
+      allCategories,
+    });
+  }
+
+  categorieAModifier.nom = nom;
+  categorieAModifier.save();
+
+  res.redirect("/categories");
+});
+
+app.post("/categorie/supprimer", estConnecte, async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    await categories.destroy({
+      where: {
+        id,
+      },
+    });
+    return res.redirect("/categories");
+  } catch (error) {
+    const allCategories = await categories.findAll();
+    console.log(error);
+    return res.render("categories/index", {
+      title: "WealthWave - Categories",
+      error:
+        "Une erreur est survenueez lors de la suppression de la categorie.",
+      allCategories,
+    });
+  }
 });
 
 app.use((req, res, next) => {
