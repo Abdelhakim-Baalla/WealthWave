@@ -670,6 +670,47 @@ app.get("/categorie/modifier", estConnecte, async (req, res) => {
   });
 });
 
+app.post("/categorie/modifier", estConnecte, async (req, res) => {
+  const { id, nom } = req.body;
+  const allCategories = await categories.findAll();
+  const categorieAModifier = await categories.findByPk(id);
+  let categorieExist = false;
+
+  if (allCategories) {
+    for (let categorie of allCategories) {
+      if (categorie.nom == nom) {
+        categorieExist = true;
+      }
+    }
+  }
+
+  if (categorieExist) {
+    function formaterDatePourAfficher(date) {
+      if (!date) return "";
+      const d = new Date(date);
+      const timezoneOffset = d.getTimezoneOffset() * 60000;
+      const localDate = new Date(d.getTime() - timezoneOffset);
+      return localDate.toISOString().slice(0, 16);
+    }
+
+    for (let categorie of allCategories) {
+      if (categorie && categorie.createdAt) {
+        categorie.date = formaterDatePourAfficher(categorie.createdAt);
+      }
+    }
+    return res.render("categories", {
+      title: "WealthWave - Modifier Categorie",
+      error: "Cette Categorie et exist déja",
+      allCategories,
+    });
+  }
+
+  categorieAModifier.nom = nom;
+  categorieAModifier.save();
+
+  res.redirect("/categories");
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });

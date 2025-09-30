@@ -17,7 +17,7 @@
       <label for="nom">Nom de categorie</label>
       <input type="text" name="nom" id="nom" value="<%= typeof categorie.nom !== 'undefined' ? categorie.nom : '' %>" /><br />
       <hr />
-      
+      <input type="hidden" name="id" value="<%= categorie.id %>">
       <button type="submit">Crée Categorie</button>
     </form>
 
