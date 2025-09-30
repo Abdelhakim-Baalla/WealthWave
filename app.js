@@ -699,7 +699,7 @@ app.post("/categorie/modifier", estConnecte, async (req, res) => {
       }
     }
     return res.render("categories", {
-      title: "WealthWave - Modifier Categorie",
+      title: "WealthWave - Categories",
       error: "Cette Categorie et exist déja",
       allCategories,
     });
@@ -709,6 +709,28 @@ app.post("/categorie/modifier", estConnecte, async (req, res) => {
   categorieAModifier.save();
 
   res.redirect("/categories");
+});
+
+app.post("/categorie/supprimer", estConnecte, async (req, res) => {
+  const { id } = req.body;
+
+  try {
+    await categories.destroy({
+      where: {
+        id,
+      },
+    });
+    return res.redirect("/categories");
+  } catch (error) {
+    const allCategories = await categories.findAll();
+    console.log(error);
+    return res.render("categories/index", {
+      title: "WealthWave - Categories",
+      error:
+        "Une erreur est survenueez lors de la suppression de la categorie.",
+      allCategories,
+    });
+  }
 });
 
 app.use((req, res, next) => {
