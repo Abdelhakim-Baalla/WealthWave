@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Abdelhakim-Baalla/WealthWave#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "csv-writer": "^1.6.0",
     "dotenv": "^17.2.2",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
