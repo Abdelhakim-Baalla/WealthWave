@@ -914,6 +914,72 @@ app.get("/budget/ajouter", estConnecte, async (req, res) => {
   });
 });
 
+app.post("/budget/ajouter", estConnecte, async (req, res) => {
+  const { nom, description, categorie, montant } = await req.body;
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    }
+  });
+
+  if (!nom || nom.length < 3) {
+    return res.render("budgets/ajouter", {
+      title: "WealthWave - Ajouter Budget",
+      error: "Le nom doit contenir au moins 3 caractères.",
+      toutCategories,
+    });
+  }
+
+  if (!categorie) {
+    return res.render("budgets/ajouter", {
+      title: "WealthWave - Ajouter Budget",
+      error: "Veuillez sélectionner une catégorie.",
+      toutCategories,
+    });
+  }
+
+  if (!montant || isNaN(montant) || montant <= 0) {
+    return res.render("budgets/ajouter", {
+      title: "WealthWave - Ajouter Budget",
+      error: "Veuillez saisir un montant positif.",
+      toutCategories,
+    });
+  }
+
+  const categorieExist = await categories.findOne({
+    where: {
+      id: categorie,
+      utilisateur: req.session.utilisateurId,
+    }
+  });
+
+  if (!categorieExist) {
+    return res.render("budgets/ajouter", {
+      title: "WealthWave - Ajouter Budget",
+      error: "La catégorie sélectionnée n'existe pas.",
+      toutCategories,
+    });
+  }
+
+  try {
+    await budgets.create({
+      nom,
+      description,
+      categorie: categorieExist.id,
+      utilisateur: req.session.utilisateurId,
+      montant,
+    });
+    return res.redirect("/budgets");
+  } catch (error) {
+    console.error(error);
+    return res.render("budgets/ajouter", {
+      title: "WealthWave - Ajouter Budget",
+      error: "Erreur lors de la création du budget.",
+      toutCategories,
+    });
+  }
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
