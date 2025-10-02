@@ -1,13 +1,21 @@
-const { createObjectCsvWriter } = require('csv-writer');
+const { createObjectCsvWriter } = require("csv-writer");
 
-async function exportVersCSV(data, nomFichier, fields) {
+async function exportToCSV(data, fileName) {
+  if (!data || data.length === 0) {
+    return null;
+  }
+
+  const fields = Object.keys(data[0]);
+
   const csvWriter = createObjectCsvWriter({
-    path: `${nomFichier}.csv`,
-    header: fields.map(field => ({ id: field, title: field })),
+    path: `${fileName}.csv`,
+
+    header: fields.map((field) => ({ id: field, title: field })),
   });
 
   await csvWriter.writeRecords(data);
-  return `${nomFichier}.csv`;
+
+  return `${fileName}.csv`;
 }
 
-module.exports = { exportVersCSV };
+module.exports = { exportToCSV };
