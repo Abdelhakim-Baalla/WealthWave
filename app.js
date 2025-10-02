@@ -8,6 +8,7 @@ const { Sequelize } = require("sequelize");
 const app = express();
 const { utilisateurs, categories, transactions } = require("./models");
 const { motDePasseRestorationTokens } = require("./models");
+const { exportToCSV } = require("./exportationCSV");
 // const { categories } = require("./models");
 const port = 8080;
 
@@ -658,7 +659,18 @@ app.get("/categories", estConnecte, async (req, res) => {
 
 app.get("/categorie/modifier", estConnecte, async (req, res) => {
   const { id } = req.query;
-  const categorie = await categories.findByPk(id);
+  const categorie = await categories.findAll({
+    where: {
+      id: id,
+      utilisateur: req.session.utilisateurId,
+    }
+  });
+
+  if(categorie.utilisateur != req.session.utilisateurId && categorie == ""){
+    return res.redirect("/categories");
+  }
+
+  console.log(categorie);
 
   if (!categorie) {
     return res.redirect("/categories");
