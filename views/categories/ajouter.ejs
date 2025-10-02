@@ -12,13 +12,16 @@
     <div class="message-message"><%= message %></div>
     <% } %>
 
-    <h1>Bonjour <%= utilisateur.prenom %> <%= utilisateur.nom %></h1>
-    <a href="/">Acceuil</a><br />
-    <a href="/deconnexion">Deconnexion</a><br />
-    <a href="/profile">Profile</a><br />
-    <a href="/ajouter-transaction">Ajouter Transaction</a><br />
-    <a href="/transactions">Transactions</a><br />
-    <a href="/categorie/ajouter">Ajouter Nouvelle Categorie</a><br />
-    <a href="/categories">Categories</a><br />
+    <form action="/categorie/ajouter" method="post">
+
+      <label for="nom">Nom de categorie</label>
+      <input type="text" name="nom" id="nom" /><br />
+      <hr />
+
+      <button type="submit">Crée Categorie</button>
+    </form>
+
+    <a href="/transactions">Retourner Au transactions</a>
+    <a href="/categories">Retourner Au Categories</a>
   </body>
 </html>

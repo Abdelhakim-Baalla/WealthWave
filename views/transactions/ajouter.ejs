@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+  </head>
+  <body>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="error-message"><%= error %></div>
+    <% } %> <% if (typeof message !== 'undefined' && message) { %>
+    <div class="message-message"><%= message %></div>
+    <% } %>
+
+    <form action="/ajouter-transaction" method="post">
+      <b>Type Des Transactions</b>
+      <label for="Revenu">Revenu</label>
+      <input type="radio" name="type" id="Revenu" value="Revenu" /><br />
+      <label for="Frais">Frais</label>
+      <input type="radio" name="type" id="Frais" value="Frais" /><br />
+      <label for="Transfert">Transfert</label>
+      <input type="radio" name="type" id="Transfert" value="Transfert" /><br />
+      <hr />
+
+      <label for="prix">Prix</label>
+      <input type="number" name="prix" id="prix" /><br />
+      <hr />
+
+      <label for="date">Date</label>
+      <input type="datetime-local" name="date" id="date" /><br />
+      <hr />
+
+      <label for="categorie">Categorie</label>
+      <select name="categorie" id="categorie">
+        <option value=""></option>
+        <% for(let categorie of toutCategories) { %>
+        <option value="<%= categorie.id %>"><%= categorie.nom %></option>
+        <% } %>
+      </select>
+      <div>
+        <a href="/categorie/ajouter">Ajouter Nouvelle Categorie</a>
+      </div>
+      <hr />
+
+      <label for="note">Note</label><br />
+      <textarea name="note" id="note" cols="50" rows="10"></textarea><br>
+      <hr>
+
+      <button type="submit">Crée Transaction</button>
+    </form>
+
+    <a href="/transactions">Retourner Au transactions</a>
+  </body>
+</html>

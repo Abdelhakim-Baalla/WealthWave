@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+  </head>
+  <body>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="error-message"><%= error %></div>
+    <% } %> <% if (typeof message !== 'undefined' && message) { %>
+    <div class="message-message"><%= message %></div>
+    <% } %>
+
+    <h1>Categories</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Crée a</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for(let categorie of allCategories) { %>
+        <tr>
+          <td><%= categorie.nom %></td>
+          <td>
+            <%= typeof categorie.date !== 'undefined' ? categorie.date : '' %>
+          </td>
+          <td>
+            <form
+              action="/categorie/modifier"
+              method="get"
+              style="display: inline"
+            >
+              <input type="hidden" name="id" value="<%= categorie.id %>" />
+              <button type="submit">Modifier</button>
+            </form>
+            <form
+              action="/categorie/supprimer"
+              method="post"
+              style="display: inline"
+            >
+              <input type="hidden" name="id" value="<%= categorie.id %>" />
+              <button type="submit">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+
+    <form action="/export" method="get" style="display: inline">
+      <input type="hidden" name="model" value="categories" />
+      <button type="submit">Exporter les Categories</button>
+    </form>
+
+    <a href="/categorie/ajouter">Ajouter une categorie</a>
+    <a href="/ajouter-transaction">Ajouter une transaction</a>
+    <a href="/profile">Profile</a>
+  </body>
+</html>
