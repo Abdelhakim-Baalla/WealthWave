@@ -1,3 +1,4 @@
+const fs = require("fs");
 const { createObjectCsvWriter } = require("csv-writer");
 
 async function exportToCSV(data, fileName) {
@@ -9,13 +10,23 @@ async function exportToCSV(data, fileName) {
 
   const csvWriter = createObjectCsvWriter({
     path: `${fileName}.csv`,
-
     header: fields.map((field) => ({ id: field, title: field })),
+    fieldDelimiter: ";",
+    encoding: "utf8",
   });
 
   await csvWriter.writeRecords(data);
 
-  return `${fileName}.csv`;
+  const filePath = `${fileName}.csv`;
+  const content = fs.readFileSync(filePath);
+  if (!content.slice(0, 3).equals(Buffer.from([0xef, 0xbb, 0xbf]))) {
+    fs.writeFileSync(
+      filePath,
+      Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), content])
+    );
+  }
+
+  return filePath;
 }
 
 module.exports = { exportToCSV };
