@@ -776,6 +776,105 @@ app.post("/categorie/supprimer", estConnecte, async (req, res) => {
   }
 });
 
+async function exportationFinale(modelData, model, utilisateurId, res, req) {
+  let data = {};
+  switch (model) {
+    case "categories":
+      data = modelData.map((d) => ({
+        nom: d.nom,
+        createdAt: d.createdAt,
+      }));
+      break;
+    case "transactions":
+      data = modelData.map((d) => ({
+        date: d.date,
+        prix: d.prix,
+        categorie: d.categorie,
+        type: d.type,
+        note: d.note,
+      }));
+      break;
+    case "budgets":
+      data = modelData.map((d) => ({
+        nom: d.nom,
+        description: d.description,
+        categorie: d.categorie,
+        utilisateur: d.utilisateur,
+        montant: d.montant,
+      }));
+      break;
+    case "objectifs":
+      data = modelData.map((d) => ({
+        titre: d.titre,
+        utilisateur: d.utilisateur,
+        montantObjectif: d.montantObjectif,
+        categorie: d.categorie,
+      }));
+      break;
+
+    default:
+      return res.send("Erreur Lors de l'exportation.");
+  }
+
+  const fileName = `${model}_${utilisateurId}`;
+  const csvPath = await exportToCSV(data, fileName);
+
+  res.download(csvPath, `${model}_export.csv`, (err) => {
+    if (err) console.log("Erreur et servenu: ", err);
+    require("fs").unlink(csvPath, (err) => {
+      if (err) console.log("Erreure dans la suppression de fichier: ", err);
+    });
+  });
+}
+
+app.get("/export", estConnecte, async (req, res) => {
+  const utilisateurId = req.session.utilisateurId;
+
+  const model = await req.query.model;
+  let modelData = "";
+  switch (model) {
+    case "categories":
+      modelData = await categories.findAll({
+        where: {
+          utilisateur: utilisateurId,
+        },
+      });
+      exportationFinale(modelData, "categories", utilisateurId, res, req);
+      break;
+    case "transactions":
+      modelData = await transactions.findAll({
+        where: {
+          utilisateur: utilisateurId,
+        },
+      });
+      exportationFinale(modelData, "transactions", utilisateurId, res, req);
+      break;
+    case "budgets":
+      modelData = await budgets.findAll({
+        where: {
+          utilisateur: utilisateurId,
+        },
+      });
+      exportationFinale(modelData, "bugdets", utilisateurId, res, req);
+      break;
+    case "objectifs":
+      modelData = await objectifs.findAll({
+        where: {
+          utilisateur: utilisateurId,
+        },
+      });
+      exportationFinale(modelData, "objectifs", utilisateurId, res, req);
+      break;
+
+    default:
+      return res.send("Erreur Lors de l'exportation.");
+  }
+
+  if (modelData.length === 0) {
+    return res.send("Aucune Data à exporter.");
+  }
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
