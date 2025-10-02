@@ -902,6 +902,18 @@ app.get("/budgets", estConnecte, async (req, res) => {
   });
 });
 
+app.get("/budget/ajouter", estConnecte, async (req, res) => {
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId, 
+    }
+  });
+  res.render("budgets/ajouter", {
+    title: "WealthWave - Ajouter Budget",
+    toutCategories,
+  });
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });

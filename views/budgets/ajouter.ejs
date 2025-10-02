@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+  </head>
+  <body>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <div class="error-message"><%= error %></div>
+    <% } %> <% if (typeof message !== 'undefined' && message) { %>
+    <div class="message-message"><%= message %></div>
+    <% } %>
+
+    <form action="/budget/ajouter" method="post">
+      <label for="nom">Nom</label>
+      <input type="text" name="nom" id="nom" /><br />
+      <hr />
+
+      <label for="description">Description</label><br />
+      <textarea name="description" id="description" cols="50" rows="10"></textarea><br />
+      <hr />
+
+      <label for="categorie">Categorie</label>
+      <select name="categorie" id="categorie">
+        <option value=""></option>
+        <% for(let categorie of toutCategories) { %>
+        <option value="<%= categorie.id %>"><%= categorie.nom %></option>
+        <% } %>
+      </select>
+      <div>
+        <a href="/categorie/ajouter">Ajouter Nouvelle Categorie</a>
+      </div>
+      <hr />
+
+      <button type="submit">Crée Budget</button>
+    </form>
+
+    <a href="/transactions">Retourner Au transactions</a>
+    <a href="/budgets">Retourner Au Budgets</a>
+  </body>
+</html>
