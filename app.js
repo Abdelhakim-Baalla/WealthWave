@@ -4,9 +4,9 @@ const session = require("express-session");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const { generateSecureToken } = require("n-digit-token");
-const { Sequelize } = require("sequelize");
+const { Sequelize, where } = require("sequelize");
 const app = express();
-const { utilisateurs, categories, transactions } = require("./models");
+const { utilisateurs, categories, transactions, budgets } = require("./models");
 const { motDePasseRestorationTokens } = require("./models");
 const { exportToCSV } = require("./exportationCSV");
 // const { categories } = require("./models");
@@ -873,6 +873,18 @@ app.get("/export", estConnecte, async (req, res) => {
   if (modelData.length === 0) {
     return res.send("Aucune Data à exporter.");
   }
+});
+
+app.get("/budgets", estConnecte, async (req, res) => {
+  const toutBudgets  = await budgets.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    }
+  });
+  res.render("budgets/index", {
+    title: "WealthWave - Budgets",
+    toutBudgets
+  });
 });
 
 app.use((req, res, next) => {
