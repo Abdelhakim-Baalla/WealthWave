@@ -48,7 +48,7 @@
       <select name="categorie" id="categorie">
         <option value=""></option>
         <% for(let categorie of toutCategories) { %>
-        <option value="<%= categorie.nom %>" <%= transactionSpecifier.categorie == categorie.id ? "selected" : '' %> ><%= categorie.nom %></option>
+        <option value="<%= categorie.id %>" <%= transactionSpecifier.categorie == categorie.id ? "selected" : '' %> ><%= categorie.nom %></option>
         <% } %>
       </select>
       <hr />
