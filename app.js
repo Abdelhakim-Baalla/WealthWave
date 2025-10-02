@@ -354,7 +354,11 @@ app.post("/restorer-mot-de-passe", nonConnecte, async (req, res) => {
 });
 
 app.get("/ajouter-transaction", estConnecte, async (req, res) => {
-  const toutCategories = await categories.findAll();
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
   res.render("transactions/ajouter", {
     title: "WealthWave - Ajouter Transaction",
     toutCategories,
@@ -363,7 +367,18 @@ app.get("/ajouter-transaction", estConnecte, async (req, res) => {
 
 app.post("/ajouter-transaction", estConnecte, async (req, res) => {
   const { type, prix, date, categorie, note } = req.body;
-  const toutCategories = await categories.findAll();
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+
+  const catSelectionner = await categories.findOne({
+    where: {
+      id: categorie,
+      utilisateur: req.session.utilisateurId,
+    },
+  });
 
   if (
     (type != "Revenu" && type != "Frais" && type != "Transfert") ||
@@ -395,7 +410,7 @@ app.post("/ajouter-transaction", estConnecte, async (req, res) => {
   let categorieExist = false;
   let categorieId;
   for (let uneCategorie of toutCategories) {
-    if (uneCategorie.nom == categorie) {
+    if (uneCategorie.utilisateur == req.session.utilisateurId) {
       categorieExist = true;
       categorieId = uneCategorie.id;
     }
@@ -423,14 +438,14 @@ app.post("/ajouter-transaction", estConnecte, async (req, res) => {
       prix,
       date: new Date(date),
       utilisateur: req.session.utilisateurId,
-      categorie: categorieId,
+      categorie: catSelectionner.id,
       note,
     });
   } catch (error) {
     console.log(error);
     return res.render("transactions/ajouter", {
       title: "WealthWave - Ajouter Transaction",
-      error: error,
+      error: "Erreur lors de creation",
       toutCategories,
     });
   }
@@ -498,7 +513,11 @@ app.post("/transactions/supprimer", estConnecte, async (req, res) => {
 app.get("/transactions/modifier", estConnecte, async (req, res) => {
   const { id } = req.query;
   const transactionSpecifier = await transactions.findByPk(id);
-  const toutCategories = await categories.findAll();
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
 
   function formaterDatePourInput(date) {
     if (!date) return "";
@@ -524,8 +543,29 @@ app.get("/transactions/modifier", estConnecte, async (req, res) => {
 app.post("/transactions/modifier", estConnecte, async (req, res) => {
   const { id, type, prix, date, categorie, note } = req.body;
   const transaction = await transactions.findByPk(id);
-  const toutCategories = await categories.findAll();
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+
+  const categorieAct = await categories.findOne({
+    where: {
+      id: categorie,
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+
   const transactionSpecifier = transaction;
+
+  if (!categorieAct) {
+    return res.render("transactions/modifier", {
+      title: "WealthWave - Ajouter Transaction",
+      error: "Il faut une vraie catégorie",
+      toutCategories,
+      transactionSpecifier,
+    });
+  }
 
   if (
     (type != "Revenu" && type != "Frais" && type != "Transfert") ||
@@ -533,7 +573,7 @@ app.post("/transactions/modifier", estConnecte, async (req, res) => {
   ) {
     return res.render("transactions/modifier", {
       title: "WealthWave - Ajouter Transaction",
-      error: "Il faut selectionnez just les type proposer",
+      error: "Il faut sélectionner juste les types proposés",
       toutCategories,
       transactionSpecifier,
     });
@@ -542,7 +582,7 @@ app.post("/transactions/modifier", estConnecte, async (req, res) => {
   if (prix <= 0 || prix == "") {
     return res.render("transactions/modifier", {
       title: "WealthWave - Ajouter Transaction",
-      error: "Il faut selectionnez un prix positif",
+      error: "Il faut sélectionner un prix positif",
       toutCategories,
       transactionSpecifier,
     });
@@ -551,43 +591,26 @@ app.post("/transactions/modifier", estConnecte, async (req, res) => {
   if (date == "") {
     return res.render("transactions/modifier", {
       title: "WealthWave - Ajouter Transaction",
-      error: "Saiser une Date",
+      error: "Saisir une Date",
       toutCategories,
       transactionSpecifier,
     });
-  }
-
-  let categorieExist = false;
-  let categorieId;
-  for (let uneCategorie of toutCategories) {
-    if (uneCategorie.nom == categorie) {
-      categorieExist = true;
-      categorieId = uneCategorie.id;
-    }
   }
 
   if (categorie == "") {
     return res.render("transactions/modifier", {
       title: "WealthWave - Ajouter Transaction",
-      error: "Selectionner une categorie",
+      error: "Sélectionner une catégorie",
       toutCategories,
       transactionSpecifier,
     });
   }
 
-  if (!categorieExist) {
-    return res.render("transactions/modifier", {
-      title: "WealthWave - Ajouter Transaction",
-      error: "La categories saisez n'exist pas",
-      toutCategories,
-      transactionSpecifier,
-    });
-  }
-
+  // Si la catégorie existe, on continue
   transaction.type = type;
   transaction.prix = prix;
   transaction.date = new Date(date);
-  transaction.categorie = categorieId;
+  transaction.categorie = categorieAct.id;
   transaction.note = note;
 
   await transaction.save();
@@ -622,6 +645,7 @@ app.post("/categorie/ajouter", estConnecte, async (req, res) => {
   try {
     await categories.create({
       nom,
+      utilisateur: req.session.utilisateurId,
     });
   } catch (error) {
     console.log(error);
@@ -638,7 +662,7 @@ app.get("/categories", estConnecte, async (req, res) => {
   const allCategories = await categories.findAll({
     where: {
       utilisateur: req.session.utilisateurId,
-    }
+    },
   });
 
   function formaterDatePourAfficher(date) {
