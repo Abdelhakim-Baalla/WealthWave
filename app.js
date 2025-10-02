@@ -441,6 +441,21 @@ app.post("/ajouter-transaction", estConnecte, async (req, res) => {
       categorie: catSelectionner.id,
       note,
     });
+
+    const budget = await budgets.findOne({
+      where: {
+        categorie: catSelectionner.id,
+        utilisateur: req.session.utilisateurId,
+      },
+    });
+    if (budget) {
+      if (type === "Frais") {
+        budget.montant -= prix;
+      } else if (type === "Revenu") {
+        budget.montant += prix;
+      }
+      await budget.save();
+    }
   } catch (error) {
     console.log(error);
     return res.render("transactions/ajouter", {
@@ -606,7 +621,6 @@ app.post("/transactions/modifier", estConnecte, async (req, res) => {
     });
   }
 
-  // Si la catégorie existe, on continue
   transaction.type = type;
   transaction.prix = prix;
   transaction.date = new Date(date);
@@ -876,25 +890,25 @@ app.get("/export", estConnecte, async (req, res) => {
 });
 
 app.get("/budgets", estConnecte, async (req, res) => {
-  const toutBudgets  = await budgets.findAll({
+  const toutBudgets = await budgets.findAll({
     where: {
       utilisateur: req.session.utilisateurId,
-    }
+    },
   });
 
-  if(toutBudgets.length > 0){
-    for(let budget of toutBudgets){
+  if (toutBudgets.length > 0) {
+    for (let budget of toutBudgets) {
       budget.categorie = await categories.findOne({
         where: {
           id: budget.categorie,
           utilisateur: req.session.utilisateurId,
-        }
+        },
       });
     }
   }
 
   const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
-  
+
   res.render("budgets/index", {
     title: "WealthWave - Budgets",
     toutBudgets,
@@ -905,8 +919,8 @@ app.get("/budgets", estConnecte, async (req, res) => {
 app.get("/budget/ajouter", estConnecte, async (req, res) => {
   const toutCategories = await categories.findAll({
     where: {
-      utilisateur: req.session.utilisateurId, 
-    }
+      utilisateur: req.session.utilisateurId,
+    },
   });
   res.render("budgets/ajouter", {
     title: "WealthWave - Ajouter Budget",
@@ -919,7 +933,7 @@ app.post("/budget/ajouter", estConnecte, async (req, res) => {
   const toutCategories = await categories.findAll({
     where: {
       utilisateur: req.session.utilisateurId,
-    }
+    },
   });
 
   if (!nom || nom.length < 3) {
@@ -950,7 +964,7 @@ app.post("/budget/ajouter", estConnecte, async (req, res) => {
     where: {
       id: categorie,
       utilisateur: req.session.utilisateurId,
-    }
+    },
   });
 
   if (!categorieExist) {
@@ -962,6 +976,19 @@ app.post("/budget/ajouter", estConnecte, async (req, res) => {
   }
 
   try {
+    const budgetExist = await budgets.findOne({
+      where: {
+        categorie: categorieExist.id,
+        utilisateur: req.session.utilisateurId,
+      },
+    });
+    if (budgetExist) {
+      return res.render("budgets/ajouter", {
+        title: "WealthWave - Ajouter Budget",
+        error: "Un budget existe déjà pour cette catégorie.",
+        toutCategories,
+      });
+    }
     await budgets.create({
       nom,
       description,
