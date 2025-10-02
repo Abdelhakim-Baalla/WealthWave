@@ -32,7 +32,7 @@
           <td>
             <%= typeof budget.categorie.nom !== 'undefined' ? budget.categorie.nom : '' %>
           </td>
-          <td><%= budget.montant %></td>
+          <td><%= budget.montant %> <%= utilisateur.devise %></td>
           <td>
             <form
               action="/budget/modifier"

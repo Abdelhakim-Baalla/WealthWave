@@ -881,9 +881,24 @@ app.get("/budgets", estConnecte, async (req, res) => {
       utilisateur: req.session.utilisateurId,
     }
   });
+
+  if(toutBudgets.length > 0){
+    for(let budget of toutBudgets){
+      budget.categorie = await categories.findOne({
+        where: {
+          id: budget.categorie,
+          utilisateur: req.session.utilisateurId,
+        }
+      });
+    }
+  }
+
+  const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
+  
   res.render("budgets/index", {
     title: "WealthWave - Budgets",
-    toutBudgets
+    toutBudgets,
+    utilisateur,
   });
 });
 
