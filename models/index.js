@@ -67,7 +67,7 @@ motDePasseRestorationTokens.belongsTo(utilisateurs, {
 });
 
 (async () => {
-  await database.sync({ alter: true });
+  await database.sync({ alter: false });
   console.log("Database synced");
 })();
 

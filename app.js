@@ -658,26 +658,31 @@ app.get("/categories", estConnecte, async (req, res) => {
 });
 
 app.get("/categorie/modifier", estConnecte, async (req, res) => {
-  const { id } = req.query;
-  const categorie = await categories.findOne({
-    where: {
-      id: id,
-      utilisateur: req.session.utilisateurId,
+  try {
+    const { id } = req.query;
+    const categorie = await categories.findOne({
+      where: {
+        id: id,
+        utilisateur: req.session.utilisateurId,
+      },
+    });
+
+    if (categorie.utilisateur != req.session.utilisateurId && categorie == "") {
+      return res.redirect("/categories");
     }
-  });
 
-  if(categorie.utilisateur != req.session.utilisateurId && categorie == ""){
-    return res.redirect("/categories");
+    if (!categorie) {
+      return res.redirect("/categories");
+    }
+
+    res.render("categories/modifier", {
+      title: "WealthWave - Modifier Categorie",
+      categorie,
+    });
+  } catch (error) {
+    console.log("erreur: ", error);
+    res.redirect("/categories");
   }
-
-  if (!categorie) {
-    return res.redirect("/categories");
-  }
-
-  res.render("categories/modifier", {
-    title: "WealthWave - Modifier Categorie",
-    categorie,
-  });
 });
 
 app.post("/categorie/modifier", estConnecte, async (req, res) => {
