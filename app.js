@@ -635,7 +635,11 @@ app.post("/categorie/ajouter", estConnecte, async (req, res) => {
 });
 
 app.get("/categories", estConnecte, async (req, res) => {
-  const allCategories = await categories.findAll();
+  const allCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    }
+  });
 
   function formaterDatePourAfficher(date) {
     if (!date) return "";
