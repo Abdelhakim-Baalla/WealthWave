@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title><%= title %></title>
+  </head>
+  <body>
+    <h2>Objectifs</h2>
+    <ul>
+      <table border="1">
+        <thead>
+          <tr>
+            <th>Titre</th>
+            <th>Montant D'objectif</th>
+            <th>Categorie</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% toutObjectifs.forEach(obj => { %>
+          <tr>
+            <td><%= obj.titre %></td>
+            <td><%= obj.montantObjectif %></td>
+            <td><%= obj.categorie %></td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </ul>
+
+    <a href="/dashboard">Retour au Dashboard</a>
+  </body>
+</html>

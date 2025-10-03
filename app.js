@@ -6,7 +6,7 @@ const nodemailer = require("nodemailer");
 const { generateSecureToken } = require("n-digit-token");
 const { Sequelize, where } = require("sequelize");
 const app = express();
-const { utilisateurs, categories, transactions, budgets } = require("./models");
+const { utilisateurs, categories, transactions, budgets, objectifs } = require("./models");
 const { motDePasseRestorationTokens } = require("./models");
 const { exportToCSV } = require("./exportationCSV");
 // const { categories } = require("./models");
@@ -1145,6 +1145,18 @@ app.post("/budget/supprimer", estConnecte, async (req, res) => {
   }
   await budgets.destroy({ where: { id } });
   res.redirect("/budgets");
+});
+
+app.get("/objectifs", estConnecte, async (req, res) => {
+  const toutObjectifs = await objectifs.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+  res.render("objectifs/index", { 
+    title: "WealthWave - Objectifs", 
+    toutObjectifs,
+  });
 });
 
 app.use((req, res, next) => {
