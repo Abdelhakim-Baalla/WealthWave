@@ -1007,6 +1007,98 @@ app.post("/budget/ajouter", estConnecte, async (req, res) => {
   }
 });
 
+app.get("/budget/modifier", estConnecte, async (req, res) => {
+  const { id } = req.query;
+  const budget = await budgets.findByPk(id);
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+  if (!budget || budget.utilisateur !== req.session.utilisateurId) {
+    return res.redirect("/budgets");
+  }
+  res.render("budgets/modifier", {
+    title: "Modifier Budget",
+    toutCategories,
+    budget,
+  });
+});
+
+app.post("/budget/modifier", estConnecte, async (req, res) => {
+  const { id, nom, description, categorie, montant } = req.body;
+  const budget = await budgets.findByPk(id);
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+  if (!budget || budget.utilisateur !== req.session.utilisateurId) {
+    return res.redirect("/budgets");
+  }
+  if (!nom || nom.length < 3) {
+    return res.render("budgets/ajouter", {
+      title: "Modifier Budget",
+      error: "Le nom doit contenir au moins 3 caractères.",
+      toutCategories,
+      budget,
+      modifier: true,
+    });
+  }
+  if (!categorie) {
+    return res.render("budgets/ajouter", {
+      title: "Modifier Budget",
+      error: "Veuillez sélectionner une catégorie.",
+      toutCategories,
+      budget,
+      modifier: true,
+    });
+  }
+  if (!montant || isNaN(montant) || montant <= 0) {
+    return res.render("budgets/ajouter", {
+      title: "Modifier Budget",
+      error: "Veuillez saisir un montant positif.",
+      toutCategories,
+      budget,
+      modifier: true,
+    });
+  }
+
+  if (budget.categorie != categorie) {
+    const budgetExist = await budgets.findOne({
+      where: {
+        categorie,
+        utilisateur: req.session.utilisateurId,
+      },
+    });
+    if (budgetExist) {
+      return res.render("budgets/ajouter", {
+        title: "Modifier Budget",
+        error: "Un budget existe déjà pour cette catégorie.",
+        toutCategories,
+        budget,
+        modifier: true,
+      });
+    }
+  }
+  budget.nom = nom;
+  budget.description = description;
+  budget.categorie = categorie;
+  budget.montant = montant;
+  await budget.save();
+  res.redirect("/budgets");
+});
+
+app.post("/budget/supprimer", estConnecte, async (req, res) => {
+  const { id } = req.body;
+  const budget = await budgets.findByPk(id);
+  if (!budget || budget.utilisateur !== req.session.utilisateurId) {
+    return res.redirect("/budgets");
+  }
+  await budgets.destroy({ where: { id } });
+  res.redirect("/budgets");
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
