@@ -1247,6 +1247,20 @@ app.post("/objectif/ajouter", estConnecte, async (req, res) => {
   res.redirect("/objectifs");
 });
 
+app.post("/objectif/supprimer", estConnecte, async (req, res) => {
+  const { id } = req.body;
+  const objectif = await objectifs.findByPk(id);
+  if (!objectif || objectif.utilisateur !== req.session.utilisateurId) {
+    return res.redirect("/objectifs");
+  }
+  await objectifs.destroy({ 
+    where: { 
+      id,
+    } 
+  });
+  res.redirect("/objectifs");
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
