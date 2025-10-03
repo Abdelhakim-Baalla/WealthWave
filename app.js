@@ -1278,12 +1278,54 @@ app.get("/objectif/modifier", estConnecte, async (req, res) => {
       utilisateur: req.session.utilisateurId,
     },
   });
-  
+
   res.render("objectifs/modifier", {
     title: "WealthWave - Modifier Objectif",
     objectif,
     toutCategories,
   });
+});
+
+app.post("/objectif/modifier", estConnecte, async (req, res) => {
+  const { id, titre, montantObjectif, categorie } = req.body;
+  const objectif = await objectifs.findByPk(id);
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+  if (!objectif || objectif.utilisateur !== req.session.utilisateurId) {
+    return res.redirect("/objectifs");
+  }
+  if (!titre || titre.length < 3) {
+    return res.render("objectifs/modifier", {
+      title: "WealthWave - Modifier Objectif",
+      error: "Le titre doit contenir au moins 3 caractères.",
+      toutCategories,
+      objectif,
+    });
+  }
+  if (!categorie) {
+    return res.render("objectifs/modifier", {
+      title: "WealthWave - Modifier Objectif",
+      error: "Veuillez sélectionner une catégorie.",
+      toutCategories,
+      objectif,
+    });
+  }
+  if (!montantObjectif || isNaN(montantObjectif) || montantObjectif <= 0) {
+    return res.render("objectifs/modifier", {
+      title: "WealthWave - Modifier Objectif",
+      error: "Veuillez saisir un montant objectif positif.",
+      toutCategories,
+      objectif,
+    });
+  }
+  objectif.titre = titre;
+  objectif.montantObjectif = montantObjectif;
+  objectif.categorie = categorie;
+  await objectif.save();
+  res.redirect("/objectifs");
 });
 
 app.use((req, res, next) => {
