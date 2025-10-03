@@ -52,5 +52,44 @@
         </tr>
       </tbody>
     </table>
+
+    <% let pourcentageRevenus = (totalRevenus / (totalRevenus + totalFrais) *
+    100) || 0; let pourcentageFrais = (totalFrais / (totalRevenus + totalFrais)
+    * 100) || 0; %>
+
+    <h2>Progressions</h2>
+
+    <span>Revenus</span>
+    <div
+      style="
+        border: 1px solid #ccc;
+        width: 100%;
+        height: 30px;
+        margin-bottom: 10px;
+      "
+    > 
+      <div
+        style="
+          height: 100%;
+          width: <%= pourcentageRevenus %>%;
+          background-color: green;
+          text-align: right;
+          color: white;
+        "
+      ><%= Math.floor(pourcentageRevenus) %>%</div>
+    </div>
+
+    <span>Frais</span>
+    <div style="border: 1px solid #ccc; width: 100%; height: 30px">
+      <div
+        style="
+          height: 100%;
+          width: <%= pourcentageFrais %>%;
+          background-color: red;
+          text-align: right;
+          color: white;
+        "
+      ><%= Math.floor(pourcentageFrais) %>%</div>
+    </div>
   </body>
 </html>
