@@ -4,9 +4,9 @@ const session = require("express-session");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 const { generateSecureToken } = require("n-digit-token");
-const { Sequelize } = require("sequelize");
+const { Sequelize, where } = require("sequelize");
 const app = express();
-const { utilisateurs, categories, transactions } = require("./models");
+const { utilisateurs, categories, transactions, budgets } = require("./models");
 const { motDePasseRestorationTokens } = require("./models");
 const { exportToCSV } = require("./exportationCSV");
 // const { categories } = require("./models");
@@ -441,6 +441,21 @@ app.post("/ajouter-transaction", estConnecte, async (req, res) => {
       categorie: catSelectionner.id,
       note,
     });
+
+    const budget = await budgets.findOne({
+      where: {
+        categorie: catSelectionner.id,
+        utilisateur: req.session.utilisateurId,
+      },
+    });
+    if (budget) {
+      if (type === "Frais") {
+        budget.montant -= prix;
+      } else if (type === "Revenu") {
+        budget.montant += prix;
+      }
+      await budget.save();
+    }
   } catch (error) {
     console.log(error);
     return res.render("transactions/ajouter", {
@@ -606,7 +621,6 @@ app.post("/transactions/modifier", estConnecte, async (req, res) => {
     });
   }
 
-  // Si la catégorie existe, on continue
   transaction.type = type;
   transaction.prix = prix;
   transaction.date = new Date(date);
@@ -873,6 +887,216 @@ app.get("/export", estConnecte, async (req, res) => {
   if (modelData.length === 0) {
     return res.send("Aucune Data à exporter.");
   }
+});
+
+app.get("/budgets", estConnecte, async (req, res) => {
+  const toutBudgets = await budgets.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+
+  if (toutBudgets.length > 0) {
+    for (let budget of toutBudgets) {
+      budget.categorie = await categories.findOne({
+        where: {
+          id: budget.categorie,
+          utilisateur: req.session.utilisateurId,
+        },
+      });
+    }
+  }
+
+  const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
+
+  res.render("budgets/index", {
+    title: "WealthWave - Budgets",
+    toutBudgets,
+    utilisateur,
+  });
+});
+
+app.get("/budget/ajouter", estConnecte, async (req, res) => {
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+  res.render("budgets/ajouter", {
+    title: "WealthWave - Ajouter Budget",
+    toutCategories,
+  });
+});
+
+app.post("/budget/ajouter", estConnecte, async (req, res) => {
+  const { nom, description, categorie, montant } = await req.body;
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+
+  if (!nom || nom.length < 3) {
+    return res.render("budgets/ajouter", {
+      title: "WealthWave - Ajouter Budget",
+      error: "Le nom doit contenir au moins 3 caractères.",
+      toutCategories,
+    });
+  }
+
+  if (!categorie) {
+    return res.render("budgets/ajouter", {
+      title: "WealthWave - Ajouter Budget",
+      error: "Veuillez sélectionner une catégorie.",
+      toutCategories,
+    });
+  }
+
+  if (!montant || isNaN(montant) || montant <= 0) {
+    return res.render("budgets/ajouter", {
+      title: "WealthWave - Ajouter Budget",
+      error: "Veuillez saisir un montant positif.",
+      toutCategories,
+    });
+  }
+
+  const categorieExist = await categories.findOne({
+    where: {
+      id: categorie,
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+
+  if (!categorieExist) {
+    return res.render("budgets/ajouter", {
+      title: "WealthWave - Ajouter Budget",
+      error: "La catégorie sélectionnée n'existe pas.",
+      toutCategories,
+    });
+  }
+
+  try {
+    const budgetExist = await budgets.findOne({
+      where: {
+        categorie: categorieExist.id,
+        utilisateur: req.session.utilisateurId,
+      },
+    });
+    if (budgetExist) {
+      return res.render("budgets/ajouter", {
+        title: "WealthWave - Ajouter Budget",
+        error: "Un budget existe déjà pour cette catégorie.",
+        toutCategories,
+      });
+    }
+    await budgets.create({
+      nom,
+      description,
+      categorie: categorieExist.id,
+      utilisateur: req.session.utilisateurId,
+      montant,
+    });
+    return res.redirect("/budgets");
+  } catch (error) {
+    console.error(error);
+    return res.render("budgets/ajouter", {
+      title: "WealthWave - Ajouter Budget",
+      error: "Erreur lors de la création du budget.",
+      toutCategories,
+    });
+  }
+});
+
+app.get("/budget/modifier", estConnecte, async (req, res) => {
+  const { id } = req.query;
+  const budget = await budgets.findByPk(id);
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+  if (!budget || budget.utilisateur !== req.session.utilisateurId) {
+    return res.redirect("/budgets");
+  }
+  res.render("budgets/modifier", {
+    title: "Modifier Budget",
+    toutCategories,
+    budget,
+  });
+});
+
+app.post("/budget/modifier", estConnecte, async (req, res) => {
+  const { id, nom, description, categorie, montant } = req.body;
+  const budget = await budgets.findByPk(id);
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+  if (!budget || budget.utilisateur !== req.session.utilisateurId) {
+    return res.redirect("/budgets");
+  }
+  if (!nom || nom.length < 3) {
+    return res.render("budgets/ajouter", {
+      title: "Modifier Budget",
+      error: "Le nom doit contenir au moins 3 caractères.",
+      toutCategories,
+      budget,
+      modifier: true,
+    });
+  }
+  if (!categorie) {
+    return res.render("budgets/ajouter", {
+      title: "Modifier Budget",
+      error: "Veuillez sélectionner une catégorie.",
+      toutCategories,
+      budget,
+      modifier: true,
+    });
+  }
+  if (!montant || isNaN(montant) || montant <= 0) {
+    return res.render("budgets/ajouter", {
+      title: "Modifier Budget",
+      error: "Veuillez saisir un montant positif.",
+      toutCategories,
+      budget,
+      modifier: true,
+    });
+  }
+
+  if (budget.categorie != categorie) {
+    const budgetExist = await budgets.findOne({
+      where: {
+        categorie,
+        utilisateur: req.session.utilisateurId,
+      },
+    });
+    if (budgetExist) {
+      return res.render("budgets/ajouter", {
+        title: "Modifier Budget",
+        error: "Un budget existe déjà pour cette catégorie.",
+        toutCategories,
+        budget,
+        modifier: true,
+      });
+    }
+  }
+  budget.nom = nom;
+  budget.description = description;
+  budget.categorie = categorie;
+  budget.montant = montant;
+  await budget.save();
+  res.redirect("/budgets");
+});
+
+app.post("/budget/supprimer", estConnecte, async (req, res) => {
+  const { id } = req.body;
+  const budget = await budgets.findByPk(id);
+  if (!budget || budget.utilisateur !== req.session.utilisateurId) {
+    return res.redirect("/budgets");
+  }
+  await budgets.destroy({ where: { id } });
+  res.redirect("/budgets");
 });
 
 app.use((req, res, next) => {
