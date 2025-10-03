@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title><%= title %></title>
+  </head>
+  <body>
+    <h2>Ajouter un Objectif</h2>
+    <form action="/objectif/ajouter" method="POST">
+      <label for="titre">Titre:</label>
+      <input type="text" id="titre" name="titre" required /><br />
+
+      <label for="montantObjectif">Montant D'objectif:</label>
+      <input
+        type="number"
+        id="montantObjectif"
+        name="montantObjectif"
+        required
+      /><br />
+
+      <label for="categorie">Categorie:</label>
+      <select id="categorie" name="categorie" required>
+        <option value=""></option>
+        <% for(let categorie of toutCategories) { %>
+        <option value="<%= categorie.id %>"><%= categorie.nom %></option>
+        <% } %></select><br />
+
+      <input type="submit" value="Ajouter" />
+    </form>
+
+    <a href="/dashboard">Retour au Dashboard</a>
+    <a href="/objectifs">Retour à la liste des Objectifs</a>
+  </body>
+</html>

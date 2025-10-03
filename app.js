@@ -1159,6 +1159,18 @@ app.get("/objectifs", estConnecte, async (req, res) => {
   });
 });
 
+app.get("/objectif/ajouter", estConnecte, async (req, res) => {
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+  res.render("objectifs/ajouter", {
+    title: "WealthWave - Ajouter Objectif",
+    toutCategories,
+  });
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
