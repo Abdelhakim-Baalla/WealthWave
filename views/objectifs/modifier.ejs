@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title><%= title %></title>
+  </head>
+  <body>
+    <h2>Modifier Objectif</h2>
+    <form action="/objectif/modifier" method="POST">
+      <label for="titre">Titre:</label>
+      <input
+        type="text"
+        id="titre"
+        name="titre"
+        value="<%= typeof objectif.titre !== 'undefined' ? objectif.titre : '' %>"
+        required
+      /><br />
+
+      <label for="montantObjectif">Montant D'objectif:</label>
+      <input
+        type="number"
+        id="montantObjectif"
+        name="montantObjectif"
+        value="<%= typeof objectif.montantObjectif !== 'undefined' ? objectif.montantObjectif : '' %>"
+        required
+      /><br />
+
+      <label for="categorie">Categorie:</label>
+      <select id="categorie" name="categorie" required>
+        <option value=""></option>
+        <% for(let categorie of toutCategories) { %>
+        <option
+          value="<%= categorie.id %>"
+          <%= objectif.categorie && objectif.categorie.id === categorie.id ? 'selected' : '' %>
+        >
+          <%= categorie.nom %>
+        </option>
+        <% } %></select
+      ><br />
+
+      <input type="hidden" name="id" value="<%= objectif.id %>" />
+      <input type="submit" value="Modifier" />
+    </form>
+
+    <a href="/dashboard">Retour au Dashboard</a>
+    <a href="/objectifs">Retour à la liste des Objectifs</a>
+  </body>

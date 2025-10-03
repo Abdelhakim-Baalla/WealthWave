@@ -1261,6 +1261,31 @@ app.post("/objectif/supprimer", estConnecte, async (req, res) => {
   res.redirect("/objectifs");
 });
 
+app.get("/objectif/modifier", estConnecte, async (req, res) => {
+  const { id } = req.query;
+  const objectif = await objectifs.findByPk(id);
+  if (!objectif || objectif.utilisateur !== req.session.utilisateurId) {
+    return res.redirect("/objectifs");
+  }
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+  objectif.categorie = await categories.findOne({
+    where: {
+      id: objectif.categorie,
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+  
+  res.render("objectifs/modifier", {
+    title: "WealthWave - Modifier Objectif",
+    objectif,
+    toutCategories,
+  });
+});
+
 app.use((req, res, next) => {
   res.status(404).render("404");
 });
