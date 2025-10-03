@@ -177,7 +177,55 @@ app.post("/connexion", async (req, res) => {
 
 app.get("/dashboard", estConnecte, async (req, res) => {
   const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
-  res.render("dashboard", { title: "Dashboard - WealthWave", utilisateur });
+  if (!utilisateur) {
+    return res.status(404).send("Utilisateur introuvable");
+  }
+  const toutTransactions = await transactions.findAll({
+    where: {
+      utilisateur: utilisateur.id,
+    },
+  });
+
+  let totalRevenus = 0;
+  for (let transactionActuelle of toutTransactions) {
+    if (transactionActuelle.type === "Revenu") {
+      totalRevenus += transactionActuelle.prix;
+    }
+  }
+
+  let totalFrais = 0;
+  for (let transactionActuelle of toutTransactions) {
+    if (transactionActuelle.type === "Frais") {
+      totalFrais += transactionActuelle.prix;
+    }
+  }
+
+  const soldeNet = totalRevenus - totalFrais;
+
+  const sommeParCategorie = {};
+
+  for (let transactionActuelle of toutTransactions) {
+    transactionActuelle.categorie = await categories.findOne({
+      where: {
+        id: transactionActuelle.categorie,
+      },
+    });
+
+    if (!sommeParCategorie[transactionActuelle.categorie.nom]) {
+      sommeParCategorie[transactionActuelle.categorie.nom] = 0;
+    }
+    sommeParCategorie[transactionActuelle.categorie.nom] +=
+      transactionActuelle.prix;
+  }
+
+  res.render("dashboard", {
+    title: "Dashboard - WealthWave",
+    utilisateur,
+    totalRevenus,
+    totalFrais,
+    soldeNet,
+    sommeParCategorie,
+  });
 });
 
 app.get("/deconnexion", (req, res) => {
