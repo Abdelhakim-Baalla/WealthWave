@@ -21,5 +21,36 @@
     <a href="/categorie/ajouter">Ajouter Nouvelle Categorie</a><br />
     <a href="/categories">Categories</a><br />
     <a href="/budgets">Budgets</a><br />
+
+    <hr />
+
+    <h2>Résumé des Transactions</h2>
+    <p>Total des Revenus: <%= totalRevenus %> <%= utilisateur.devise %></p>
+    <p>Total des Frais: <%= totalFrais %> <%= utilisateur.devise %></p>
+    <p>Solde Net: <%= soldeNet %> <%= utilisateur.devise %></p>
+
+    <hr />
+    <h2>Somme des Transactions Par Catégorie</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Catégorie</th>
+          <th>Somme</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% let total = 0; Object.entries(sommeParCategorie).forEach(([categorie,
+        somme]) => { total+=somme; %>
+        <tr>
+          <td><%= categorie %></td>
+          <td><%= somme %> <%= utilisateur.devise %></td>
+        </tr>
+        <% }) %>
+        <tr>
+          <td><strong>Total</strong></td>
+          <td><strong><%= total %> <%= utilisateur.devise %></strong></td>
+        </tr>
+      </tbody>
+    </table>
   </body>
 </html>
