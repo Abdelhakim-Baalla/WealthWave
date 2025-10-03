@@ -12,14 +12,34 @@
             <th>Titre</th>
             <th>Montant D'objectif</th>
             <th>Categorie</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <% toutObjectifs.forEach(obj => { %>
           <tr>
             <td><%= obj.titre %></td>
-            <td><%= obj.montantObjectif %></td>
-            <td><%= obj.categorie %></td>
+            <td><%= obj.montantObjectif %> <%= utilisateur.devise %></td>
+            <td><%= obj.categorie.nom %></td>
+            <td>
+              <form
+                action="/objectif/modifier"
+                method="get"
+                style="display: inline"
+              >
+                <input type="hidden" name="id" value="<%= obj.id %>" />
+                <button type="submit">Modifier</button>
+              </form>
+               <form
+                action="/objectif/supprimer"
+                method="post"
+                style="display: inline"
+              >
+                <input type="hidden" name="id" value="<%= obj.id %>" />
+                <button type="submit">Supprimer</button>
+              </form>
+            </td>
+           
           </tr>
           <% }); %>
         </tbody>

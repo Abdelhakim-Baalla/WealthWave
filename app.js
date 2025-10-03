@@ -6,7 +6,13 @@ const nodemailer = require("nodemailer");
 const { generateSecureToken } = require("n-digit-token");
 const { Sequelize, where } = require("sequelize");
 const app = express();
-const { utilisateurs, categories, transactions, budgets, objectifs } = require("./models");
+const {
+  utilisateurs,
+  categories,
+  transactions,
+  budgets,
+  objectifs,
+} = require("./models");
 const { motDePasseRestorationTokens } = require("./models");
 const { exportToCSV } = require("./exportationCSV");
 // const { categories } = require("./models");
@@ -1148,14 +1154,25 @@ app.post("/budget/supprimer", estConnecte, async (req, res) => {
 });
 
 app.get("/objectifs", estConnecte, async (req, res) => {
+  const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
   const toutObjectifs = await objectifs.findAll({
     where: {
       utilisateur: req.session.utilisateurId,
     },
   });
-  res.render("objectifs/index", { 
-    title: "WealthWave - Objectifs", 
+  for (let objectif of toutObjectifs) {
+    objectif.categorie = await categories.findOne({
+      where: {
+        id: objectif.categorie,
+        utilisateur: req.session.utilisateurId,
+      },
+    });
+  }
+
+  res.render("objectifs/index", {
+    title: "WealthWave - Objectifs",
     toutObjectifs,
+    utilisateur,
   });
 });
 
@@ -1169,6 +1186,65 @@ app.get("/objectif/ajouter", estConnecte, async (req, res) => {
     title: "WealthWave - Ajouter Objectif",
     toutCategories,
   });
+});
+
+app.post("/objectif/ajouter", estConnecte, async (req, res) => {
+  const { titre, montantObjectif, categorie } = await req.body;
+  const toutCategories = await categories.findAll({
+    where: {
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+  if (!titre || titre.length < 3) {
+    return res.render("objectifs/ajouter", {
+      title: "WealthWave - Ajouter Objectif",
+      error: "Le titre doit contenir au moins 3 caractères.",
+      toutCategories,
+    });
+  }
+  if (!categorie) {
+    return res.render("objectifs/ajouter", {
+      title: "WealthWave - Ajouter Objectif",
+      error: "Veuillez sélectionner une catégorie.",
+      toutCategories,
+    });
+  }
+  if (!montantObjectif || isNaN(montantObjectif) || montantObjectif <= 0) {
+    return res.render("objectifs/ajouter", {
+      title: "WealthWave - Ajouter Objectif",
+      error: "Veuillez saisir un montant objectif positif.",
+      toutCategories,
+    });
+  }
+  const categorieExist = await categories.findOne({
+    where: {
+      id: categorie,
+      utilisateur: req.session.utilisateurId,
+    },
+  });
+  if (!categorieExist) {
+    return res.render("objectifs/ajouter", {
+      title: "WealthWave - Ajouter Objectif",
+      error: "La catégorie sélectionnée n'existe pas.",
+      toutCategories,
+    });
+  }
+  try {
+    await objectifs.create({
+      titre,
+      montantObjectif,
+      categorie: categorieExist.id,
+      utilisateur: req.session.utilisateurId,
+    });
+  } catch (error) {
+    console.error("Erreur lors de la création de l'objectif :", error);
+    return res.render("objectifs/ajouter", {
+      title: "WealthWave - Ajouter Objectif",
+      error: "Une erreur est survenue lors de la création de l'objectif.",
+      toutCategories,
+    });
+  }
+  res.redirect("/objectifs");
 });
 
 app.use((req, res, next) => {
