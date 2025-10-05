@@ -1,0 +1,141 @@
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="/" class="nav-brand">
+      <img src="../../assets/WealthWave-logo-normal.png" alt="WealthWave" class="h-6 w-6" />
+      <span>WealthWave</span>
+    </a>
+
+    <div class="nav-links">
+      <a class="nav-link" href="/dashboard">Dashboard</a>
+      <a class="nav-link" href="/transactions">Transactions</a>
+      <a class="nav-link" href="/budgets">Budgets</a>
+      <a class="nav-link" href="/categories">Catégories</a>
+      <a class="nav-link" href="/objectifs">Objectifs</a>
+    </div>
+
+    <div class="nav-actions">
+      <button
+        id="btn-bell"
+        class="bell-btn"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          class="h-5 w-5"
+        >
+          <path
+            d="M5 8a7 7 0 1114 0c0 2.485.77 3.88 1.4 4.7.35.46.6 1.03.6 1.65v.15A1.5 1.5 0 0119.5 16h-15A1.5 1.5 0 013 14.5v-.15c0-.62.25-1.19.6-1.65C4.23 11.88 5 10.485 5 8z"
+          />
+          <path d="M10 18a2 2 0 104 0h-4z" />
+        </svg>
+        <% if (typeof notifications !== 'undefined' && notifications &&
+        notifications.some(n => !n.lu)) { %>
+        <span class="notif-dot"></span>
+        <% } %>
+      </button>
+      <% if (typeof utilisateur !== 'undefined') { %>
+      <a class="btn btn-primary" href="/deconnexion">Déconnexion</a>
+      <a class="btn btn-primary" href="/profile">Profile</a>
+      <% } else { %>
+      <a class="btn btn-outline" href="/connexion">Connexion</a>
+      <% } %>
+
+      <div
+        id="notif-panel"
+        class="notif-panel"
+        role="dialog"
+        aria-labelledby="notif-title"
+      >
+        <div class="notif-header">
+          <div id="notif-title" class="font-semibold">Notifications</div>
+          <button id="close-notif" class="btn btn-outline px-2 py-1 text-xs">
+            Fermer
+          </button>
+        </div>
+        <div class="notif-list">
+          <% if (typeof notifications === 'undefined' || !notifications ||
+          !notifications.length) { %>
+          <div class="p-6 text-sm text-slate-500">Aucune notification.</div>
+          <% } else { %> <% notifications.forEach(function(n) { %>
+          <div class="notif-item">
+            <div class="notif-title">
+              <span class="badge"><%= n.type %></span>
+              <span><%= n.titre %></span>
+            </div>
+            <div class="notif-msg"><%= n.message %></div>
+          </div>
+          <% }) %> <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  (function () {
+    var btn = document.getElementById("btn-bell");
+    var panel = document.getElementById("notif-panel");
+    var closeBtn = document.getElementById("close-notif");
+
+    if (btn) {
+      function hide() {
+        panel.classList.add("hidden");
+        btn.setAttribute("aria-expanded", "false");
+      }
+
+      function toggle() {
+        panel.classList.toggle("block");
+        btn.setAttribute(
+          "aria-expanded",
+          panel.classList.contains("hidden") ? "false" : "true"
+        );
+      }
+
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        toggle();
+      });
+
+      if (closeBtn) {
+        closeBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          hide();
+        });
+      }
+
+      document.addEventListener("click", function (e) {
+        if (!panel.contains(e.target) && e.target !== btn) {
+          hide();
+        }
+      });
+    }
+
+    // Gestion du menu rapide (si présent)
+    var qb = document.getElementById("btn-quick");
+    var qm = document.getElementById("quick-menu");
+
+    if (qb && qm) {
+      function hideQ() {
+        qm.classList.add("hidden");
+      }
+
+      function toggleQ() {
+        qm.classList.toggle("hidden");
+      }
+
+      qb.addEventListener("click", function (e) {
+        e.stopPropagation();
+        toggleQ();
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!qm.contains(e.target) && e.target !== qb) {
+          hideQ();
+        }
+      });
+    }
+  })();
+</script>

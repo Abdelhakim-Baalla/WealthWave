@@ -2,16 +2,36 @@
 <html>
   <head>
     <title><%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <% if (typeof error !== 'undefined' && error) { %>
-    <div class="error-message"><%= error %></div>
-    <% } %> <% if (typeof message !== 'undefined' && message) { %>
-    <div class="message-message"><%= message %></div>
-    <% } %>
-    <h1>Hello World!</h1>
-    <a href="/users">Voir les Utilisateurs</a>
-    <a href="/inscription">Inscrire</a>
-    <a href="/connexion">Connectez</a>
+    <%- include('partials/navbar') %>
+    <div class="container-page">
+      <% if (typeof error !== 'undefined' && error) { %>
+      <div class="badge bg-red-100 text-red-700"><%= error %></div>
+      <% } %> <% if (typeof message !== 'undefined' && message) { %>
+      <div class="badge bg-green-100 text-green-700"><%= message %></div>
+      <% } %>
+
+      <div class="card">
+        <div class="card-header">
+          <h1 class="text-2xl font-bold font-display">WealthWave</h1>
+        </div>
+        <div class="card-body space-y-4">
+          <p class="text-slate-600 dark:text-slate-300">Bienvenue 👋</p>
+          <div class="flex gap-3 flex-wrap">
+            <a class="btn btn-primary" href="/users">Voir les Utilisateurs</a>
+            <a class="btn btn-outline" href="/inscription">Inscrire</a>
+            <a class="btn btn-outline" href="/connexion">Connectez</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

@@ -4,51 +4,96 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <% if (typeof error !== 'undefined' && error) { %>
-    <div class="error-message"><%= error %></div>
-    <% } %> <% if (typeof message !== 'undefined' && message) { %>
-    <div class="message-message"><%= message %></div>
-    <% } %>
+    <%- include('../partials/navbar') %>
+    <div class="container-page max-w-2xl">
+      <% if (typeof error !== 'undefined' && error) { %>
+      <div class="badge bg-red-100 text-red-700 mb-4"><%= error %></div>
+      <% } %> <% if (typeof message !== 'undefined' && message) { %>
+      <div class="badge bg-green-100 text-green-700 mb-4"><%= message %></div>
+      <% } %>
 
-    <form action="/ajouter-transaction" method="post">
-      <b>Type Des Transactions</b>
-      <label for="Revenu">Revenu</label>
-      <input type="radio" name="type" id="Revenu" value="Revenu" /><br />
-      <label for="Frais">Frais</label>
-      <input type="radio" name="type" id="Frais" value="Frais" /><br />
-      <label for="Transfert">Transfert</label>
-      <input type="radio" name="type" id="Transfert" value="Transfert" /><br />
-      <hr />
-
-      <label for="prix">Prix</label>
-      <input type="number" name="prix" id="prix" /><br />
-      <hr />
-
-      <label for="date">Date</label>
-      <input type="datetime-local" name="date" id="date" /><br />
-      <hr />
-
-      <label for="categorie">Categorie</label>
-      <select name="categorie" id="categorie">
-        <option value=""></option>
-        <% for(let categorie of toutCategories) { %>
-        <option value="<%= categorie.id %>"><%= categorie.nom %></option>
-        <% } %>
-      </select>
-      <div>
-        <a href="/categorie/ajouter">Ajouter Nouvelle Categorie</a>
+      <div class="card">
+        <div class="card-header">Créer une transaction</div>
+        <div class="card-body">
+          <form action="/ajouter-transaction" method="post" class="space-y-4">
+            <div>
+              <label class="label">Type de transaction</label>
+              <div class="flex gap-4">
+                <label class="flex items-center">
+                  <input type="radio" name="type" value="Revenu" class="mr-2" />
+                  Revenu
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="type" value="Frais" class="mr-2" />
+                  Frais
+                </label>
+                <label class="flex items-center">
+                  <input type="radio" name="type" value="Transfert" class="mr-2" />
+                  Transfert
+                </label>
+              </div>
+            </div>
+            
+            <div>
+              <label for="prix" class="label">Prix</label>
+              <input class="input" type="number" name="prix" id="prix" />
+            </div>
+            
+            <div>
+              <label for="date" class="label">Date</label>
+              <input class="input" type="datetime-local" name="date" id="date" />
+            </div>
+            
+            <div>
+              <label for="categorie" class="label">Categorie</label>
+              <select class="input" name="categorie" id="categorie">
+                <option value=""></option>
+                <% for(let categorie of toutCategories) { %>
+                <option value="<%= categorie.id %>">
+                  <%= categorie.nom %>
+                </option>
+                <% } %>
+              </select>
+              <div class="mt-2">
+                <a class="btn btn-outline" href="/categorie/ajouter"
+                  >Ajouter Nouvelle Categorie</a
+                >
+              </div>
+            </div>
+            
+            <div>
+              <label for="note" class="label">Note</label>
+              <textarea
+                class="input"
+                name="note"
+                id="note"
+                rows="6"
+              ></textarea>
+            </div>
+            
+            <div>
+              <button class="btn btn-primary" type="submit">
+                Créer Transaction
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-      <hr />
 
-      <label for="note">Note</label><br />
-      <textarea name="note" id="note" cols="50" rows="10"></textarea><br>
-      <hr>
-
-      <button type="submit">Crée Transaction</button>
-    </form>
-
-    <a href="/transactions">Retourner Au transactions</a>
+      <div class="flex gap-2 mt-4">
+        <a class="btn btn-outline" href="/transactions"
+          >Retourner aux transactions</a
+        >
+      </div>
+    </div>
   </body>
 </html>

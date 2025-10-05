@@ -1,4 +1,5 @@
 require("dotenv").config();
+const path = require("path");
 const express = require("express");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
@@ -35,6 +36,7 @@ app.use(
     },
   })
 );
+app.use(express.static(path.join(__dirname, "public")));
 
 function estConnecte(req, res, next) {
   if (req.session.utilisateurId) {
@@ -590,6 +592,11 @@ app.get("/transactions", estConnecte, async (req, res) => {
       ["id", "DESC"],
     ],
   });
+  const userNotifications = await notifications.findAll({
+    where: { utilisateur: utilisateur.id },
+    order: [["createdAt", "DESC"]],
+    limit: 10,
+  });
 
   for (let index = 0; index < toutTransactions.length; index++) {
     let categorieChanger = await categories.findOne({
@@ -604,6 +611,7 @@ app.get("/transactions", estConnecte, async (req, res) => {
     title: "WealthWave - Transactions",
     toutTransactions,
     utilisateur,
+    notifications: userNotifications,
   });
 });
 
@@ -790,6 +798,12 @@ app.get("/categories", estConnecte, async (req, res) => {
     },
   });
 
+  const userNotifications = await notifications.findAll({
+    where: { utilisateur: req.session.utilisateurId },
+    order: [["createdAt", "DESC"]],
+    limit: 10,
+  });
+
   function formaterDatePourAfficher(date) {
     if (!date) return "";
     const d = new Date(date);
@@ -807,6 +821,7 @@ app.get("/categories", estConnecte, async (req, res) => {
   res.render("categories/index", {
     title: "WealthWave - Categories",
     allCategories,
+    notifications: userNotifications,
   });
 });
 
@@ -1020,10 +1035,17 @@ app.get("/budgets", estConnecte, async (req, res) => {
 
   const utilisateur = await utilisateurs.findByPk(req.session.utilisateurId);
 
+  const userNotifications = await notifications.findAll({
+    where: { utilisateur: utilisateur.id },
+    order: [["createdAt", "DESC"]],
+    limit: 10,
+  });
+
   res.render("budgets/index", {
     title: "WealthWave - Budgets",
     toutBudgets,
     utilisateur,
+    notifications: userNotifications,
   });
 });
 
@@ -1217,6 +1239,12 @@ app.get("/objectifs", estConnecte, async (req, res) => {
       utilisateur: req.session.utilisateurId,
     },
   });
+  const userNotifications = await notifications.findAll({
+    where: { utilisateur: utilisateur.id },
+    order: [["createdAt", "DESC"]],
+    limit: 10,
+  });
+
   for (let objectif of toutObjectifs) {
     objectif.categorie = await categories.findOne({
       where: {
@@ -1230,6 +1258,7 @@ app.get("/objectifs", estConnecte, async (req, res) => {
     title: "WealthWave - Objectifs",
     toutObjectifs,
     utilisateur,
+    notifications: userNotifications,
   });
 });
 

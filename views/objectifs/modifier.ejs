@@ -2,45 +2,49 @@
 <html lang="fr">
   <head>
     <title><%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <h2>Modifier Objectif</h2>
-    <form action="/objectif/modifier" method="POST">
-      <label for="titre">Titre:</label>
-      <input
-        type="text"
-        id="titre"
-        name="titre"
-        value="<%= typeof objectif.titre !== 'undefined' ? objectif.titre : '' %>"
-        required
-      /><br />
+    <%- include('../partials/navbar') %>
+    <div class="container-page max-w-2xl">
+      <div class="card">
+        <div class="card-header">Modifier Objectif</div>
+        <div class="card-body">
+          <form action="/objectif/modifier" method="POST" class="space-y-4">
+            <div>
+              <label for="titre" class="label">Titre</label>
+              <input class="input" type="text" id="titre" name="titre" value="<%= typeof objectif.titre !== 'undefined' ? objectif.titre : '' %>" required />
+            </div>
+            <div>
+              <label for="montantObjectif" class="label">Montant D'objectif</label>
+              <input class="input" type="number" id="montantObjectif" name="montantObjectif" value="<%= typeof objectif.montantObjectif !== 'undefined' ? objectif.montantObjectif : '' %>" required />
+            </div>
+            <div>
+              <label for="categorie" class="label">Categorie</label>
+              <select class="input" id="categorie" name="categorie" required>
+                <option value=""></option>
+                <% for(let categorie of toutCategories) { %>
+                <option value="<%= categorie.id %>" <%= objectif.categorie && objectif.categorie.id === categorie.id ? 'selected' : '' %>><%= categorie.nom %></option>
+                <% } %>
+              </select>
+            </div>
+            <input type="hidden" name="id" value="<%= objectif.id %>" />
+            <div>
+              <button class="btn btn-primary" type="submit">Modifier</button>
+            </div>
+          </form>
+        </div>
+      </div>
 
-      <label for="montantObjectif">Montant D'objectif:</label>
-      <input
-        type="number"
-        id="montantObjectif"
-        name="montantObjectif"
-        value="<%= typeof objectif.montantObjectif !== 'undefined' ? objectif.montantObjectif : '' %>"
-        required
-      /><br />
-
-      <label for="categorie">Categorie:</label>
-      <select id="categorie" name="categorie" required>
-        <option value=""></option>
-        <% for(let categorie of toutCategories) { %>
-        <option
-          value="<%= categorie.id %>"
-          <%= objectif.categorie && objectif.categorie.id === categorie.id ? 'selected' : '' %>
-        >
-          <%= categorie.nom %>
-        </option>
-        <% } %></select
-      ><br />
-
-      <input type="hidden" name="id" value="<%= objectif.id %>" />
-      <input type="submit" value="Modifier" />
-    </form>
-
-    <a href="/dashboard">Retour au Dashboard</a>
-    <a href="/objectifs">Retour à la liste des Objectifs</a>
+      <div class="flex gap-2 mt-4">
+        <a class="btn btn-outline" href="/dashboard">Retour au Dashboard</a>
+        <a class="btn btn-outline" href="/objectifs">Retour à la liste des Objectifs</a>
+      </div>
+    </div>
   </body>

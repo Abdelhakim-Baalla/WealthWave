@@ -4,44 +4,63 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <% if (typeof error !== 'undefined' && error) { %>
-    <div class="error-message"><%= error %></div>
-    <% } %> <% if (typeof message !== 'undefined' && message) { %>
-    <div class="message-message"><%= message %></div>
-    <% } %>
+    <%- include('../partials/navbar') %>
+    <div class="container-page max-w-2xl">
+      <% if (typeof error !== 'undefined' && error) { %>
+      <div class="badge bg-red-100 text-red-700 mb-4"><%= error %></div>
+      <% } %> <% if (typeof message !== 'undefined' && message) { %>
+      <div class="badge bg-green-100 text-green-700 mb-4"><%= message %></div>
+      <% } %>
 
-    <form action="/budget/modifier" method="post">
-      <input type="hidden" name="id" value="<%= budget ? budget.id : '' %>" />
-      <label for="nom">Nom</label>
-      <input type="text" name="nom" id="nom" value="<%= budget ? budget.nom : '' %>" /><br />
-      <hr />
-
-      <label for="description">Description</label><br />
-      <textarea name="description" id="description" cols="50" rows="10"><%= budget ? budget.description : '' %></textarea><br />
-      <hr />
-
-      <label for="categorie">Categorie</label>
-      <select name="categorie" id="categorie">
-        <option value=""></option>
-        <% for(let categorie of toutCategories) { %>
-        <option value="<%= categorie.id %>" <%= budget && budget.categorie == categorie.id ? 'selected' : '' %>><%= categorie.nom %></option>
-        <% } %>
-      </select>
-      <div>
-        <a href="/categorie/ajouter">Ajouter Nouvelle Categorie</a>
+      <div class="card">
+        <div class="card-header">Modifier le budget</div>
+        <div class="card-body">
+          <form action="/budget/modifier" method="post" class="space-y-4">
+            <input type="hidden" name="id" value="<%= budget ? budget.id : '' %>" />
+            <div>
+              <label for="nom" class="label">Nom</label>
+              <input class="input" type="text" name="nom" id="nom" value="<%= budget ? budget.nom : '' %>" />
+            </div>
+            <div>
+              <label for="description" class="label">Description</label>
+              <textarea class="input" name="description" id="description" rows="6"><%= budget ? budget.description : '' %></textarea>
+            </div>
+            <div>
+              <label for="categorie" class="label">Categorie</label>
+              <select class="input" name="categorie" id="categorie">
+                <option value=""></option>
+                <% for(let categorie of toutCategories) { %>
+                <option value="<%= categorie.id %>" <%= budget && budget.categorie == categorie.id ? 'selected' : '' %>><%= categorie.nom %></option>
+                <% } %>
+              </select>
+              <div class="mt-2">
+                <a class="btn btn-outline" href="/categorie/ajouter">Ajouter Nouvelle Categorie</a>
+              </div>
+            </div>
+            <div>
+              <label for="montant" class="label">Montant</label>
+              <input class="input" type="number" name="montant" id="montant" value="<%= budget ? budget.montant : '' %>" />
+            </div>
+            <div>
+              <button class="btn btn-primary" type="submit">Modifier Budget</button>
+            </div>
+          </form>
+        </div>
       </div>
-      <hr />
 
-      <label for="montant">Montant</label>
-      <input type="number" name="montant" id="montant" value="<%= budget ? budget.montant : '' %>" /><br />
-      <hr />
-
-      <button type="submit">Modifier Budget</button>
-    </form>
-
-    <a href="/transactions">Retourner Au transactions</a>
-    <a href="/budgets">Retourner Au Budgets</a>
+      <div class="flex gap-2 mt-4">
+        <a class="btn btn-outline" href="/transactions">Retourner aux transactions</a>
+        <a class="btn btn-outline" href="/budgets">Retourner aux budgets</a>
+      </div>
+    </div>
   </body>
 </html>

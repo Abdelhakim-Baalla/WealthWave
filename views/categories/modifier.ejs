@@ -4,24 +4,57 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <% if (typeof error !== 'undefined' && error) { %>
-    <div class="error-message"><%= error %></div>
-    <% } %> <% if (typeof message !== 'undefined' && message) { %>
-    <div class="message-message"><%= message %></div>
-    <% } %>
+    <%- include('../partials/navbar') %>
+    <div class="container-page max-w-2xl">
+      <% if (typeof error !== 'undefined' && error) { %>
+      <div class="badge bg-red-100 text-red-700 mb-4"><%= error %></div>
+      <% } %> <% if (typeof message !== 'undefined' && message) { %>
+      <div class="badge bg-green-100 text-green-700 mb-4"><%= message %></div>
+      <% } %>
 
-    <form action="/categorie/modifier" method="post">
+      <div class="card">
+        <div class="card-header">Modifier la catégorie</div>
+        <div class="card-body">
+          <form action="/categorie/modifier" method="post" class="space-y-4">
+            <input type="hidden" name="id" value="<%= categorie.id %>" />
+            
+            <div>
+              <label for="nom" class="label">Nom de catégorie</label>
+              <input 
+                class="input" 
+                type="text" 
+                name="nom" 
+                id="nom" 
+                value="<%= typeof categorie.nom !== 'undefined' ? categorie.nom : '' %>" 
+              />
+            </div>
+            
+            <div>
+              <button class="btn btn-primary" type="submit">
+                Modifier Catégorie
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
 
-      <label for="nom">Nom de categorie</label>
-      <input type="text" name="nom" id="nom" value="<%= typeof categorie.nom !== 'undefined' ? categorie.nom : '' %>" /><br />
-      <hr />
-      <input type="hidden" name="id" value="<%= categorie.id %>">
-      <button type="submit">Crée Categorie</button>
-    </form>
-
-    <a href="/transactions">Retourner Au transactions</a>
-    <a href="/categories">Retourner Au categories</a>
+      <div class="flex gap-2 mt-4">
+        <a class="btn btn-outline" href="/transactions">
+          Retourner aux transactions
+        </a>
+        <a class="btn btn-outline" href="/categories">
+          Retourner aux catégories
+        </a>
+      </div>
+    </div>
   </body>
 </html>
