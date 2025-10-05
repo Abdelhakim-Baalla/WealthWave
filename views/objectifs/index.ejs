@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title><%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <%- include('../partials/navbar') %>
+    <div class="layout">
+      <%- include('../partials/sidebar') %>
+      <div class="space-y-6">
+        <div class="card">
+          <div class="card-header">Objectifs</div>
+          <div class="card-body">
+            <table class="table-basic">
+              <thead>
+                <tr>
+                  <th class="px-4 py-2">Titre</th>
+                  <th class="px-4 py-2">Montant D'objectif</th>
+                  <th class="px-4 py-2">Catégorie</th>
+                  <th class="px-4 py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% toutObjectifs.forEach(obj => { %>
+                <tr>
+                  <td class="px-4 py-2"><%= obj.titre %></td>
+                  <td class="px-4 py-2">
+                    <%= obj.montantObjectif %> <%= utilisateur.devise %>
+                  </td>
+                  <td class="px-4 py-2"><%= obj.categorie.nom %></td>
+                  <td class="px-4 py-2">
+                    <form
+                      action="/objectif/modifier"
+                      method="get"
+                      style="display: inline"
+                    >
+                      <input type="hidden" name="id" value="<%= obj.id %>" />
+                      <button class="btn btn-outline" type="submit">
+                        Modifier
+                      </button>
+                    </form>
+                    <form
+                      action="/objectif/supprimer"
+                      method="post"
+                      style="display: inline"
+                    >
+                      <input type="hidden" name="id" value="<%= obj.id %>" />
+                      <button class="btn btn-outline" type="submit">
+                        Supprimer
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a class="btn btn-primary" href="/objectif/ajouter"
+            >Ajouter un Objectif</a
+          >
+          <a class="btn btn-outline" href="/dashboard">Retour au Dashboard</a>
+          <a class="btn btn-outline" href="/objectifs"
+            >Retour à la liste des Objectifs</a
+          >
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

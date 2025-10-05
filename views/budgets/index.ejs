@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <%- include('../partials/navbar') %>
+    <div class="layout">
+      <%- include('../partials/sidebar') %>
+      <div class="space-y-6">
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div class="badge bg-red-100 text-red-700"><%= error %></div>
+        <% } %> <% if (typeof message !== 'undefined' && message) { %>
+        <div class="badge bg-green-100 text-green-700"><%= message %></div>
+        <% } %>
+
+        <div class="card">
+          <div class="card-header">Budgets</div>
+          <div class="card-body">
+            <table class="table-basic">
+              <thead>
+                <tr>
+                  <th class="px-4 py-2">Nom</th>
+                  <th class="px-4 py-2">Description</th>
+                  <th class="px-4 py-2">Catégorie</th>
+                  <th class="px-4 py-2">Montant</th>
+                  <th class="px-4 py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for(let budget of toutBudgets) { %>
+                <tr>
+                  <td class="px-4 py-2"><%= budget.nom %></td>
+                  <td class="px-4 py-2">
+                    <%= typeof budget.description !== 'undefined' ?
+                    budget.description : '' %>
+                  </td>
+                  <td class="px-4 py-2">
+                    <%= typeof budget.categorie.nom !== 'undefined' ?
+                    budget.categorie.nom : '' %>
+                  </td>
+                  <td class="px-4 py-2">
+                    <%= budget.montant %> <%= utilisateur.devise %>
+                  </td>
+                  <td class="px-4 py-2 space-x-2">
+                    <form
+                      action="/budget/modifier"
+                      method="get"
+                      style="display: inline"
+                    >
+                      <input type="hidden" name="id" value="<%= budget.id %>" />
+                      <button class="btn btn-outline" type="submit">
+                        Modifier
+                      </button>
+                    </form>
+                    <form
+                      action="/budget/supprimer"
+                      method="post"
+                      style="display: inline"
+                    >
+                      <input type="hidden" name="id" value="<%= budget.id %>" />
+                      <button class="btn btn-outline" type="submit">
+                        Supprimer
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a class="btn btn-primary" href="/budget/ajouter"
+            >Ajouter un budget</a
+          >
+          <form action="/export" method="get" style="display: inline">
+            <input type="hidden" name="model" value="budgets" />
+            <button class="btn btn-outline" type="submit">
+              Exporter les Budgets
+            </button>
+          </form>
+          <a class="btn btn-outline" href="/profile">Profile</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

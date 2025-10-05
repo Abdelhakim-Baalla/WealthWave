@@ -4,21 +4,220 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"></script>
+    <link rel="shortcut icon" href="/assets/favicon-32x32.png" type="image/x-icon">
   </head>
-  <body>
-    <% if (typeof error !== 'undefined' && error) { %>
-    <div class="error-message"><%= error %></div>
-    <% } %> <% if (typeof message !== 'undefined' && message) { %>
-    <div class="message-message"><%= message %></div>
-    <% } %>
+  <body class="bg-slate-50 dark:bg-surface">
+    <%- include('partials/navbar') %>
+    <div class="layout">
+      <%- include('partials/sidebar') %>
+      <div class="space-y-6">
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div class="badge bg-red-100 text-red-700"><%= error %></div>
+        <% } %> 
+        <% if (typeof message !== 'undefined' && message) { %>
+        <div class="badge bg-green-100 text-green-700"><%= message %></div>
+        <% } %>
 
-    <h1>Bonjour <%= utilisateur.prenom %> <%= utilisateur.nom %></h1>
-    <a href="/">Acceuil</a><br />
-    <a href="/deconnexion">Deconnexion</a><br />
-    <a href="/profile">Profile</a><br />
-    <a href="/ajouter-transaction">Ajouter Transaction</a><br />
-    <a href="/transactions">Transactions</a><br />
-    <a href="/categorie/ajouter">Ajouter Nouvelle Categorie</a><br />
-    <a href="/categories">Categories</a><br />
+        <section class="wallet-hero">
+          <div class="wallet-hero-inner">
+            <h1 class="text-2xl md:text-3xl font-bold font-display">
+              Bonjour <%= utilisateur.prenom %> <%= utilisateur.nom %>
+            </h1>
+          </div>
+        </section>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="flex flex-wrap gap-2">
+              <a class="btn btn-outline" href="/ajouter-transaction"
+                >Ajouter Transaction</a
+              >
+              <a class="btn btn-outline" href="/categorie/ajouter"
+                >Ajouter Nouvelle Categorie</a
+              >
+              <a class="btn btn-outline" href="/budget/ajouter"
+                >Ajouter Nouvelle Budget</a
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="text-sm text-slate-500">Total des Revenus</div>
+              <div class="text-2xl font-semibold text-emerald-600">
+                <%= totalRevenus %> <%= utilisateur.devise %>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="text-sm text-slate-500">Total des Frais</div>
+              <div class="text-2xl font-semibold text-rose-600">
+                <%= totalFrais %> <%= utilisateur.devise %>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <div class="text-sm text-slate-500">Solde Net</div>
+              <div class="text-2xl font-semibold">
+                <%= soldeNet %> <%= utilisateur.devise %>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">Somme des Transactions Par Catégorie</div>
+          <div class="card-body">
+            <table class="table-basic">
+              <thead>
+                <tr>
+                  <th class="px-4 py-2">Catégorie</th>
+                  <th class="px-4 py-2">Somme</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% 
+                let total = 0;
+                Object.entries(sommeParCategorie).forEach(([categorie, somme]) => { 
+                  total += somme; 
+                %>
+                <tr>
+                  <td class="px-4 py-2"><%= categorie %></td>
+                  <td class="px-4 py-2">
+                    <%= somme %> <%= utilisateur.devise %>
+                  </td>
+                </tr>
+                <% }) %>
+                <tr>
+                  <td class="px-4 py-2 font-semibold">Total</td>
+                  <td class="px-4 py-2 font-semibold">
+                    <%= total %> <%= utilisateur.devise %>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <% 
+        let pourcentageRevenus = 0; 
+        let pourcentageFrais = 0; 
+        if (totalRevenus + totalFrais > 0) { 
+          pourcentageRevenus = (totalRevenus / (totalRevenus + totalFrais)) * 100; 
+          pourcentageFrais = (totalFrais / (totalRevenus + totalFrais)) * 100; 
+        } 
+        %>
+
+        <div class="card">
+          <div class="card-header">Progressions</div>
+          <div class="card-body space-y-3">
+            <div>
+              <div class="mb-1 text-sm text-slate-600">Revenus</div>
+              <div class="h-3 w-full rounded-full bg-slate-200 overflow-hidden">
+                <div
+                  class="h-full bg-emerald-500 text-xs text-white text-right pr-1"
+                  data-width="<%= Math.floor(pourcentageRevenus) %>"
+                  style="width: <%= Math.floor(pourcentageRevenus) %>%"
+                ></div>
+              </div>
+            </div>
+            <div>
+              <div class="mb-1 text-sm text-slate-600">Frais</div>
+              <div class="h-3 w-full rounded-full bg-slate-200 overflow-hidden">
+                <div
+                  class="h-full bg-rose-500 text-xs text-white text-right pr-1"
+                  data-width="<%= Math.floor(pourcentageFrais) %>"
+                  style="width: <%= Math.floor(pourcentageFrais) %>%"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">Dépenses par Catégorie</div>
+          <div class="card-body">
+            <% if ((Object.keys(depensesParCategorie || {})).length === 0) { %>
+            <p class="text-slate-500">
+              Aucune dépense à afficher pour le moment.
+            </p>
+            <% } else { %> 
+            <% 
+              const _labelsJson = JSON.stringify(Object.keys(depensesParCategorie || {})); 
+              const _valuesJson = JSON.stringify(Object.values(depensesParCategorie || {})); 
+            %>
+            <canvas
+              id="categorieChart"
+              width="200"
+              height="200"
+              data-labels="<%= _labelsJson %>"
+              data-values="<%= _valuesJson %>"
+            ></canvas>
+            <script>
+              const categorieEl = document.getElementById("categorieChart");
+              const labelsCategorie = JSON.parse(
+                categorieEl.dataset.labels || "[]"
+              );
+              const dataCategorie = JSON.parse(
+                categorieEl.dataset.values || "[]"
+              );
+              const ctxCategorie = categorieEl.getContext("2d");
+              new Chart(ctxCategorie, {
+                type: "pie",
+                data: {
+                  labels: labelsCategorie,
+                  datasets: [
+                    {
+                      data: dataCategorie,
+                      backgroundColor: [
+                        "#ef4444",
+                        "#3b82f6",
+                        "#10b981",
+                        "#f59e0b",
+                        "#8b5cf6",
+                        "#06b6d4",
+                        "#f97316",
+                        "#22c55e",
+                      ],
+                    },
+                  ],
+                },
+                options: {
+                  plugins: {
+                    title: { display: true, text: "Dépenses par Catégorie" },
+                    legend: { position: "bottom" },
+                  },
+                },
+              });
+            </script>
+            <% } %>
+          </div>
+        </div>
+        <script>
+          (function () {
+            var bars = document.querySelectorAll("[data-width]");
+            for (var i = 0; i < bars.length; i++) {
+              var value = parseInt(
+                bars[i].getAttribute("data-width") || "0",
+                10
+              );
+              if (!isNaN(value)) bars[i].style.width = value + "%";
+            }
+          })();
+        </script>
+      </div>
+    </div>
   </body>
 </html>
