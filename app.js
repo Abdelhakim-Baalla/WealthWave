@@ -1,4 +1,5 @@
 require("dotenv").config();
+const path = require('path');
 const express = require("express");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
@@ -35,6 +36,7 @@ app.use(
     },
   })
 );
+app.use(express.static(path.join(__dirname, 'public')));
 
 function estConnecte(req, res, next) {
   if (req.session.utilisateurId) {
