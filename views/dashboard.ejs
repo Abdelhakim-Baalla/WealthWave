@@ -49,31 +49,6 @@
           </div>
         </div>
 
-        <% if (typeof notifications !== 'undefined' && notifications && notifications.length) { %>
-        <div class="card">
-          <div class="card-header">Notifications</div>
-          <div class="card-body">
-            <ul class="space-y-2">
-              <% notifications.forEach(function(n) { %> 
-              <% const isUnread = !n.lu; %>
-              <li class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800">
-                <div class="flex items-center gap-2">
-                  <span class="badge"><%= n.type %></span>
-                  <span
-                    class="font-medium <%= isUnread ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300' %>"
-                    ><%= n.titre %></span
-                  >
-                </div>
-                <div class="text-sm text-slate-600 dark:text-slate-300 mt-1">
-                  <%= n.message %>
-                </div>
-              </li>
-              <% }) %>
-            </ul>
-          </div>
-        </div>
-        <% } %>
-
         <div class="grid gap-4 md:grid-cols-3">
           <div class="card">
             <div class="card-body">
