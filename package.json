@@ -1,12 +1,14 @@
 {
   "name": "wealthwave",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "WealthWave, une entreprise innovante dans le secteur de la FinTech, souhaite développer une application web moderne de gestion de budget personnel. L'objectif est de permettre aux utilisateurs de suivre leurs dépenses, gérer leurs objectifs financiers et visualiser leurs données financières de manière interactive.",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
     "build:css": "tailwindcss -i ./src/input.css -o ./public/styles.css --minify",
-    "watch:css": "tailwindcss -i ./src/input.css -o ./public/styles.css --watch"
+    "watch:css": "tailwindcss -i ./src/input.css -o ./public/styles.css --watch",
+    "build": "npm run build:css"
   },
   "repository": {
     "type": "git",
