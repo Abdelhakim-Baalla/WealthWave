@@ -4,52 +4,93 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= typeof title !== 'undefined' ? title : 'profile' %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <% if (typeof error !== 'undefined' && error) { %>
-    <div class="error-message"><%= error %></div>
-    <% } %> <% if (typeof message !== 'undefined' && message) { %>
-    <div class="message-message"><%= message %></div>
-    <% } %>
+    <%- include('partials/navbar') %>
+    <div class="container-page max-w-3xl space-y-6">
+      <% if (typeof error !== 'undefined' && error) { %>
+      <div class="badge bg-red-100 text-red-700"><%= error %></div>
+      <% } %> <% if (typeof message !== 'undefined' && message) { %>
+      <div class="badge bg-green-100 text-green-700"><%= message %></div>
+      <% } %>
 
-    <form action="/profile" method="post">
-      <h1>Les information personnels</h1>
-      <img src="" alt="Image de profile" />
-      <input type="file" name="image" id="image" /><br />
-      <label for="nom">Nom</label>
-      <input
-        type="text"
-        name="nom"
-        id="nom"
-        value="<%= typeof utilisateur.nom !== 'undefined' ? utilisateur.nom : '' %>"
-      /><br />
-      <label for="prenom">Prenom</label>
-      <input
-        type="text"
-        name="prenom"
-        id="prenom"
-        value="<%= typeof utilisateur.prenom !== 'undefined' ? utilisateur.prenom : '' %>"
-      /><br />
-      <label for="email">Email</label>
-      <input
-        type="email"
-        name="email"
-        id="email"
-        value="<%= typeof utilisateur.email !== 'undefined' ? utilisateur.email : '' %>"
-      /><br />
+      <div class="card">
+        <div class="card-header">
+          <h1 class="text-xl font-display font-semibold">Profil</h1>
+        </div>
+        <div class="card-body">
+          <form action="/profile" method="post" class="space-y-6">
+            <div class="flex items-center gap-4">
+              <img
+                class="h-16 w-16 rounded-full object-cover bg-slate-200"
+                src=""
+                alt="Image de profile"
+              />
+              <input class="input" type="file" name="image" id="image" />
+            </div>
 
-      <h1>Preferences</h1>
-      <label for="devise">Devise</label>
-      <input
-        type="text"
-        name="devise"
-        id="devise"
-        value="<%= typeof utilisateur.devise !== 'undefined' ? utilisateur.devise : '' %>"
-      /><br />
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label class="label" for="nom">Nom</label>
+                <input
+                  class="input"
+                  type="text"
+                  name="nom"
+                  id="nom"
+                  value="<%= typeof utilisateur.nom !== 'undefined' ? utilisateur.nom : '' %>"
+                />
+              </div>
+              <div>
+                <label class="label" for="prenom">Prenom</label>
+                <input
+                  class="input"
+                  type="text"
+                  name="prenom"
+                  id="prenom"
+                  value="<%= typeof utilisateur.prenom !== 'undefined' ? utilisateur.prenom : '' %>"
+                />
+              </div>
+            </div>
 
-      <button type="submit">Enregistrer</button>
-    </form>
+            <div>
+              <label class="label" for="email">Email</label>
+              <input
+                class="input"
+                type="email"
+                name="email"
+                id="email"
+                value="<%= typeof utilisateur.email !== 'undefined' ? utilisateur.email : '' %>"
+              />
+            </div>
 
-    <a href="/dashboard">Retour au Dashboard</a>
+            <div>
+              <label class="label" for="devise">Devise</label>
+              <input
+                class="input"
+                type="text"
+                name="devise"
+                id="devise"
+                value="<%= typeof utilisateur.devise !== 'undefined' ? utilisateur.devise : '' %>"
+              />
+            </div>
+
+            <div>
+              <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div>
+        <a class="btn btn-outline" href="/dashboard">Retour au Dashboard</a>
+      </div>
+    </div>
   </body>
 </html>

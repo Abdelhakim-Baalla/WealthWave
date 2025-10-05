@@ -4,27 +4,58 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Restoration de mot de passe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <% if (typeof error !== 'undefined' && error) { %>
-    <div class="error-message"><%= error %></div>
-    <% } %> <% if (typeof message !== 'undefined' && message) { %>
-    <div class="message-message"><%= message %></div>
-    <% } %>
-    <h1>Restoration de mot de passe</h1>
-    <form
-      action="/restorer-mot-de-passe?token=<%= token %>&email=<%= newEmail %>"
-      method="post"
-    >
-      <label for="newPassword">Nouveaux mot de passe</label>
-      <input type="password" name="newPassword" id="newPassword" required />
-      <button type="submit">Réinitialiser le mot de passe</button>
-    </form>
-    <% if (typeof resend !== 'undefined' && resend) { %>
-    <form action="/motdepasseoublie" method="post">
-      <input type="hidden" name="email" value="<%= newEmail %>" />
-      <button type="submit">Renvoyer l'email de réinitialisation</button>
-    </form>
-    <% } %>
+    <%- include('partials/navbar') %>
+    <div class="container-page max-w-md">
+      <% if (typeof error !== 'undefined' && error) { %>
+      <div class="badge bg-red-100 text-red-700 mb-4"><%= error %></div>
+      <% } %> <% if (typeof message !== 'undefined' && message) { %>
+      <div class="badge bg-green-100 text-green-700 mb-4"><%= message %></div>
+      <% } %>
+
+      <div class="card">
+        <div class="card-header">Restoration de mot de passe</div>
+        <div class="card-body">
+          <form
+            action="/restorer-mot-de-passe?token=<%= token %>&email=<%= newEmail %>"
+            method="post"
+            class="space-y-4"
+          >
+            <div>
+              <label class="label" for="newPassword"
+                >Nouveau mot de passe</label
+              >
+              <input
+                class="input"
+                type="password"
+                name="newPassword"
+                id="newPassword"
+                required
+              />
+            </div>
+            <button class="btn btn-primary" type="submit">
+              Réinitialiser le mot de passe
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <% if (typeof resend !== 'undefined' && resend) { %>
+      <form class="mt-4" action="/motdepasseoublie" method="post">
+        <input type="hidden" name="email" value="<%= newEmail %>" />
+        <button class="btn btn-outline" type="submit">
+          Renvoyer l'email de réinitialisation
+        </button>
+      </form>
+      <% } %>
+    </div>
   </body>
 </html>

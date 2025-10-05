@@ -4,59 +4,91 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= title %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <% if (typeof error !== 'undefined' && error) { %>
-    <div class="error-message"><%= error %></div>
-    <% } %> <% if (typeof message !== 'undefined' && message) { %>
-    <div class="message-message"><%= message %></div>
-    <% } %>
-
-    <h1>Categories</h1>
-    <table border="1">
-      <thead>
-        <tr>
-          <th>Nom</th>
-          <th>Crée a</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% for(let categorie of allCategories) { %>
-        <tr>
-          <td><%= categorie.nom %></td>
-          <td>
-            <%= typeof categorie.date !== 'undefined' ? categorie.date : '' %>
-          </td>
-          <td>
-            <form
-              action="/categorie/modifier"
-              method="get"
-              style="display: inline"
-            >
-              <input type="hidden" name="id" value="<%= categorie.id %>" />
-              <button type="submit">Modifier</button>
-            </form>
-            <form
-              action="/categorie/supprimer"
-              method="post"
-              style="display: inline"
-            >
-              <input type="hidden" name="id" value="<%= categorie.id %>" />
-              <button type="submit">Supprimer</button>
-            </form>
-          </td>
-        </tr>
+    <%- include('../partials/navbar') %>
+    <div class="layout">
+      <%- include('../partials/sidebar') %>
+      <div class="space-y-6">
+        <% if (typeof error !== 'undefined' && error) { %>
+        <div class="badge bg-red-100 text-red-700"><%= error %></div>
+        <% } %> <% if (typeof message !== 'undefined' && message) { %>
+        <div class="badge bg-green-100 text-green-700"><%= message %></div>
         <% } %>
-      </tbody>
-    </table>
 
-    <form action="/export" method="get" style="display: inline">
-      <input type="hidden" name="model" value="categories" />
-      <button type="submit">Exporter les Categories</button>
-    </form>
+        <div class="card">
+          <div class="card-header">Catégories</div>
+          <div class="card-body">
+            <table class="table-basic">
+              <thead>
+                <tr>
+                  <th class="px-4 py-2">Nom</th>
+                  <th class="px-4 py-2">Créé à</th>
+                  <th class="px-4 py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for(let categorie of allCategories) { %>
+                <tr>
+                  <td class="px-4 py-2"><%= categorie.nom %></td>
+                  <td class="px-4 py-2">
+                    <%= typeof categorie.date !== 'undefined' ? categorie.date :
+                    '' %>
+                  </td>
+                  <td class="px-4 py-2">
+                    <form
+                      action="/categorie/modifier"
+                      method="get"
+                      style="display: inline"
+                    >
+                      <input
+                        type="hidden"
+                        name="id"
+                        value="<%= categorie.id %>"
+                      />
+                      <button class="btn btn-outline" type="submit">
+                        Modifier
+                      </button>
+                    </form>
+                    <form
+                      action="/categorie/supprimer"
+                      method="post"
+                      style="display: inline"
+                    >
+                      <input
+                        type="hidden"
+                        name="id"
+                        value="<%= categorie.id %>"
+                      />
+                      <button class="btn btn-outline" type="submit">
+                        Supprimer
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
-    <a href="/categorie/ajouter">Ajouter une categorie</a>
-    <a href="/ajouter-transaction">Ajouter une transaction</a>
-    <a href="/profile">Profile</a>
+        <div class="flex items-center gap-2">
+          <a class="btn btn-primary" href="/categorie/ajouter"
+            >Ajouter une catégorie</a
+          >
+          <a class="btn btn-outline" href="/ajouter-transaction"
+            >Ajouter une transaction</a
+          >
+          <a class="btn btn-outline" href="/profile">Profile</a>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
