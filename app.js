@@ -207,7 +207,8 @@ app.get("/dashboard", estConnecte, async (req, res) => {
   }
 
   const soldeNet = totalRevenus - totalFrais;
-
+  const depensesParCategorie = await calculerDepensesParCategorie(req.session.utilisateurId);
+  
   const sommeParCategorie = {};
 
   for (let transactionActuelle of toutTransactions) {
@@ -231,6 +232,7 @@ app.get("/dashboard", estConnecte, async (req, res) => {
     totalFrais,
     soldeNet,
     sommeParCategorie,
+    depensesParCategorie,
   });
 });
 
@@ -1328,11 +1330,11 @@ app.post("/objectif/modifier", estConnecte, async (req, res) => {
   res.redirect("/objectifs");
 });
 
-async function calculerDepensesParCategorie(userId) {
+async function calculerDepensesParCategorie(utilisateurId) {
   const depenses = await transactions.findAll({
     where: { 
-      utilisateur: userId, 
-      type: "Frais" 
+      utilisateur: utilisateurId, 
+      type: "Frais", 
     },
   });
 
@@ -1340,7 +1342,9 @@ async function calculerDepensesParCategorie(userId) {
 
   for (let depense of depenses) {
     depense.categorie = await categories.findOne({
-      where: { id: depense.categorie },
+      where: { 
+        id: depense.categorie 
+      },
     });
 
     const cat = depense.categorie.nom || "Non catégorisé"; 
