@@ -14,17 +14,6 @@
     </div>
 
     <div class="nav-actions">
-      <div class="relative">
-        <button id="btn-quick" class="quick-btn">Actions</button>
-        <div id="quick-menu" class="quick-menu" role="menu">
-          <a class="quick-item" href="/ajouter-transaction?type=revenue"
-            >Ajouter revenu</a
-          >
-          <a class="quick-item" href="/ajouter-transaction?type=depense"
-            >Ajouter dépense</a
-          >
-        </div>
-      </div>
       <button
         id="btn-bell"
         class="bell-btn"
@@ -89,47 +78,62 @@
     var btn = document.getElementById("btn-bell");
     var panel = document.getElementById("notif-panel");
     var closeBtn = document.getElementById("close-notif");
-    function hide() {
-      panel.classList.add("hidden");
-      btn.setAttribute("aria-expanded", "false");
-    }
-    function toggle() {
-      panel.classList.toggle("hidden");
-      btn.setAttribute(
-        "aria-expanded",
-        panel.classList.contains("hidden") ? "false" : "true"
-      );
-    }
-    if (btn && panel) {
+
+    if (btn) {
+      function hide() {
+        panel.classList.add("hidden");
+        btn.setAttribute("aria-expanded", "false");
+      }
+
+      function toggle() {
+        panel.classList.toggle("block");
+        btn.setAttribute(
+          "aria-expanded",
+          panel.classList.contains("hidden") ? "false" : "true"
+        );
+      }
+
       btn.addEventListener("click", function (e) {
         e.stopPropagation();
         toggle();
       });
-      if (closeBtn)
-        closeBtn.addEventListener("click", function () {
+
+      if (closeBtn) {
+        closeBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
           hide();
         });
+      }
+
       document.addEventListener("click", function (e) {
         if (!panel.contains(e.target) && e.target !== btn) {
           hide();
         }
       });
     }
+
+    // Gestion du menu rapide (si présent)
     var qb = document.getElementById("btn-quick");
     var qm = document.getElementById("quick-menu");
-    function hideQ() {
-      qm.classList.add("hidden");
-    }
-    function toggleQ() {
-      qm.classList.toggle("hidden");
-    }
+
     if (qb && qm) {
+      function hideQ() {
+        qm.classList.add("hidden");
+      }
+
+      function toggleQ() {
+        qm.classList.toggle("hidden");
+      }
+
       qb.addEventListener("click", function (e) {
         e.stopPropagation();
         toggleQ();
       });
+
       document.addEventListener("click", function (e) {
-        if (!qm.contains(e.target) && e.target !== qb) hideQ();
+        if (!qm.contains(e.target) && e.target !== qb) {
+          hideQ();
+        }
       });
     }
   })();

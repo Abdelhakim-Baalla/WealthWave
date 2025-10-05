@@ -20,7 +20,8 @@
       <div class="space-y-6">
         <% if (typeof error !== 'undefined' && error) { %>
         <div class="badge bg-red-100 text-red-700"><%= error %></div>
-        <% } %> <% if (typeof message !== 'undefined' && message) { %>
+        <% } %> 
+        <% if (typeof message !== 'undefined' && message) { %>
         <div class="badge bg-green-100 text-green-700"><%= message %></div>
         <% } %>
 
@@ -29,9 +30,6 @@
             <h1 class="text-2xl md:text-3xl font-bold font-display">
               Bonjour <%= utilisateur.prenom %> <%= utilisateur.nom %>
             </h1>
-            <p class="mt-2 text-white/80">
-              Votre manager de portefeuille digital
-            </p>
           </div>
         </section>
 
@@ -41,25 +39,23 @@
               <a class="btn btn-outline" href="/ajouter-transaction"
                 >Ajouter Transaction</a
               >
-              <a class="btn btn-outline" href="/transactions">Transactions</a>
               <a class="btn btn-outline" href="/categorie/ajouter"
                 >Ajouter Nouvelle Categorie</a
               >
-              <a class="btn btn-outline" href="/categories">Categories</a>
-              <a class="btn btn-outline" href="/budgets">Budgets</a>
-              <a class="btn btn-outline" href="/objectifs">Objectifs</a>
+              <a class="btn btn-outline" href="/budget/ajouter"
+                >Ajouter Nouvelle Budget</a
+              >
             </div>
           </div>
         </div>
 
-        <% if (typeof notifications !== 'undefined' && notifications &&
-        notifications.length) { %>
+        <% if (typeof notifications !== 'undefined' && notifications && notifications.length) { %>
         <div class="card">
           <div class="card-header">Notifications</div>
           <div class="card-body">
             <ul class="space-y-2">
-              <% notifications.forEach(function(n) { %> <% const isUnread =
-              !n.lu; %>
+              <% notifications.forEach(function(n) { %> 
+              <% const isUnread = !n.lu; %>
               <li class="p-3 rounded-lg bg-slate-50 dark:bg-slate-800">
                 <div class="flex items-center gap-2">
                   <span class="badge"><%= n.type %></span>
@@ -116,9 +112,11 @@
                 </tr>
               </thead>
               <tbody>
-                <% let total = 0;
-                Object.entries(sommeParCategorie).forEach(([categorie, somme])
-                => { total += somme; %>
+                <% 
+                let total = 0;
+                Object.entries(sommeParCategorie).forEach(([categorie, somme]) => { 
+                  total += somme; 
+                %>
                 <tr>
                   <td class="px-4 py-2"><%= categorie %></td>
                   <td class="px-4 py-2">
@@ -137,10 +135,14 @@
           </div>
         </div>
 
-        <% let pourcentageRevenus = 0; let pourcentageFrais = 0; if
-        (totalRevenus + totalFrais > 0) { pourcentageRevenus = (totalRevenus /
-        (totalRevenus + totalFrais)) * 100; pourcentageFrais = (totalFrais /
-        (totalRevenus + totalFrais)) * 100; } %>
+        <% 
+        let pourcentageRevenus = 0; 
+        let pourcentageFrais = 0; 
+        if (totalRevenus + totalFrais > 0) { 
+          pourcentageRevenus = (totalRevenus / (totalRevenus + totalFrais)) * 100; 
+          pourcentageFrais = (totalFrais / (totalRevenus + totalFrais)) * 100; 
+        } 
+        %>
 
         <div class="card">
           <div class="card-header">Progressions</div>
@@ -175,10 +177,11 @@
             <p class="text-slate-500">
               Aucune dépense à afficher pour le moment.
             </p>
-            <% } else { %> <% const _labelsJson =
-            JSON.stringify(Object.keys(depensesParCategorie || {})); const
-            _valuesJson = JSON.stringify(Object.values(depensesParCategorie ||
-            {})); %>
+            <% } else { %> 
+            <% 
+              const _labelsJson = JSON.stringify(Object.keys(depensesParCategorie || {})); 
+              const _valuesJson = JSON.stringify(Object.values(depensesParCategorie || {})); 
+            %>
             <canvas
               id="categorieChart"
               width="200"
