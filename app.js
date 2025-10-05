@@ -12,6 +12,7 @@ const {
   transactions,
   budgets,
   objectifs,
+  notifications,
 } = require("./models");
 const { motDePasseRestorationTokens } = require("./models");
 const { exportToCSV } = require("./exportationCSV");
@@ -191,6 +192,11 @@ app.get("/dashboard", estConnecte, async (req, res) => {
       utilisateur: utilisateur.id,
     },
   });
+  const userNotifications = await notifications.findAll({
+    where: { utilisateur: utilisateur.id },
+    order: [["createdAt", "DESC"]],
+    limit: 10,
+  });
 
   let totalRevenus = 0;
   for (let transactionActuelle of toutTransactions) {
@@ -207,8 +213,10 @@ app.get("/dashboard", estConnecte, async (req, res) => {
   }
 
   const soldeNet = totalRevenus - totalFrais;
-  const depensesParCategorie = await calculerDepensesParCategorie(req.session.utilisateurId);
-  
+  const depensesParCategorie = await calculerDepensesParCategorie(
+    req.session.utilisateurId
+  );
+
   const sommeParCategorie = {};
 
   for (let transactionActuelle of toutTransactions) {
@@ -233,6 +241,7 @@ app.get("/dashboard", estConnecte, async (req, res) => {
     soldeNet,
     sommeParCategorie,
     depensesParCategorie,
+    notifications: userNotifications,
   });
 });
 
@@ -511,6 +520,52 @@ app.post("/ajouter-transaction", estConnecte, async (req, res) => {
         budget.montant += prix;
       }
       await budget.save();
+
+      if (type === "Frais" && Number(budget.montant) < 0) {
+        try {
+          await notifications.create({
+            utilisateur: req.session.utilisateurId,
+            type: "BUDGET_DEPASSE",
+            titre: `Budget dépassé: ${budget.nom || "Budget"}`,
+            message: `Vous avez dépassé le budget pour la catégorie ${catSelectionner.nom}. Solde restant: ${budget.montant}.`,
+            lu: 0,
+          });
+
+          try {
+            const transporter = nodemailer.createTransport({
+              host: "smtp.gmail.com",
+              port: 587,
+              secure: false,
+              auth: {
+                user: process.env.SMTP_USER,
+                pass: process.env.SMTP_PASS,
+              },
+            });
+
+            const destinataire = req.session.email;
+            const sujet = `Alerte: budget dépassé pour ${catSelectionner.nom}`;
+            const texte = `Bonjour,\n\nVous avez dépassé le budget pour la catégorie "${catSelectionner.nom}".\nSolde actuel du budget: ${budget.montant}.\n\n- WealthWave`;
+            const contenuHtml = `<p>Bonjour,</p><p>Vous avez <strong>dépassé le budget</strong> pour la catégorie "${catSelectionner.nom}".</p><p>Solde actuel du budget: <strong>${budget.montant}</strong>.</p><p>- WealthWave</p>`;
+
+            if (destinataire) {
+              await transporter.sendMail({
+                from: `WealthWave <${process.env.SMTP_USER}>`,
+                to: destinataire,
+                subject: sujet,
+                text: texte,
+                html: contenuHtml,
+              });
+            }
+          } catch (mailErr) {
+            console.error(
+              "Erreur lors de l'envoi de l'email de notification:",
+              mailErr
+            );
+          }
+        } catch (e) {
+          console.error("Erreur lors de la création de la notification:", e);
+        }
+      }
     }
   } catch (error) {
     console.log(error);
@@ -1332,9 +1387,9 @@ app.post("/objectif/modifier", estConnecte, async (req, res) => {
 
 async function calculerDepensesParCategorie(utilisateurId) {
   const depenses = await transactions.findAll({
-    where: { 
-      utilisateur: utilisateurId, 
-      type: "Frais", 
+    where: {
+      utilisateur: utilisateurId,
+      type: "Frais",
     },
   });
 
@@ -1342,12 +1397,12 @@ async function calculerDepensesParCategorie(utilisateurId) {
 
   for (let depense of depenses) {
     depense.categorie = await categories.findOne({
-      where: { 
-        id: depense.categorie 
+      where: {
+        id: depense.categorie,
       },
     });
 
-    const cat = depense.categorie.nom || "Non catégorisé"; 
+    const cat = depense.categorie.nom || "Non catégorisé";
     if (!categoriesDepenses[cat]) {
       categoriesDepenses[cat] = 0;
     }

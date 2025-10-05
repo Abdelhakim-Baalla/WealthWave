@@ -26,6 +26,25 @@
 
     <hr />
 
+    <% if (typeof notifications !== 'undefined' && notifications &&
+    notifications.length) { %>
+    <h2>Notifications</h2>
+    <ul>
+      <% notifications.forEach(function(n) { %> <% const isUnread = !n.lu; %>
+      <li style="margin-bottom: 8px">
+        <% if (isUnread) { %><strong
+          ><% } %>
+          <span>[<%= n.type %>]</span>
+          <span><%= n.titre %></span>
+          <div><%= n.message %></div>
+          <% if (isUnread) { %></strong
+        ><% } %>
+      </li>
+      <% }) %>
+    </ul>
+    <hr />
+    <% } %>
+
     <h2>Résumé des Transactions</h2>
     <p>Total des Revenus: <%= totalRevenus %> <%= utilisateur.devise %></p>
     <p>Total des Frais: <%= totalFrais %> <%= utilisateur.devise %></p>
