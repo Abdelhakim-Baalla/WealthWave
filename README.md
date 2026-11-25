@@ -1,5 +1,9 @@
 # WealthWave 💰
 
+[Budget fictif en lecture seule](https://baalla-wealthwave-demo.abdelhakimbaalla50.workers.dev) · [Vue du tableau de bord](https://github.com/Abdelhakim-Baalla/WealthWave/blob/main/views/dashboard.ejs)
+
+Pour reconstruire la démo depuis la racine du dépôt, exécuter `npm ci && node scripts/build-demo.cjs`. À la racine, `npx wrangler deploy` publie les fichiers générés.
+
 > **Application de gestion financière personnelle moderne et intuitive**
 
 WealthWave est une application web complète qui vous permet de gérer efficacement vos finances personnelles. Suivez vos transactions, créez des budgets, définissez des objectifs financiers et organisez vos dépenses par catégories, le tout dans une interface moderne et responsive.
